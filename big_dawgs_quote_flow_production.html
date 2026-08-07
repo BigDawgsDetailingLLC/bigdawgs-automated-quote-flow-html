@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Big Dawgs — Quote Flow</title>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#08090b;--panel:#ffffff;--line:#e2e8f0;--cream:#1e293b;--gold:#d8b258;
+ --hi:#f0cf72;--deep:#9a7230;--dim:#64748b;--warn:#ef4444; --bg:#f8fafc; --bg-alt:#f1f5f9; --btn-hover: #fffbeb; --btn-sel: #fef3c7; --border-sel: #fbbf24}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--cream);font-family:'Instrument Sans',system-ui,sans-serif;font-size:16px;line-height:1.5}
+.wrap{max-width:540px;margin:0 auto;padding:0 20px 130px}
+
+/* Header & Progress Bar */
+.bar{position:sticky;top:0;background:var(--bg);border-bottom:1px solid var(--line);padding:13px 20px 11px;z-index:40}
+.bar-in{max-width:540px;margin:0 auto;display:flex;align-items:center;gap:10px}
+.mark{display:flex;align-items:center;font-family:'Big Shoulders Display';font-weight:800;font-size:21px;letter-spacing:.5px;line-height:1;flex:1; color:var(--ink)}
+.mark img { height: 36px; width: 36px; border-radius: 50%; margin-right: 10px; object-fit: cover; box-shadow: 0 1px 3px rgba(0,0,0,0.1)}
+.prog{height:4px;background:var(--line);margin-top:11px;border-radius:2px;overflow:hidden}
+.prog i{display:block;height:100%;background:var(--gold);width:0;transition:width .25s}
+.crumb{font-family:'IBM Plex Mono';font-size:10px;color:var(--dim);letter-spacing:.6px;margin-top:7px;text-transform:uppercase; font-weight: 500;}
+
+.step{padding-top:28px;animation:in .18s ease}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+h1{font-family:'Big Shoulders Display';font-weight:700;font-size:33px;line-height:1.06;letter-spacing:-.3px;margin-bottom:8px; color:var(--ink)}
+.sub{color:var(--dim);font-size:14px;margin-bottom:20px}
+
+/* Inputs & Buttons */
+.opt{display:block;width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);color:var(--cream);
+ padding:16px 18px;border-radius:8px;margin-bottom:9px;cursor:pointer;font-family:inherit;font-size:16px;transition:.15s ease; box-shadow: 0 1px 2px rgba(0,0,0,0.02)}
+.opt:hover{border-color:var(--deep); background:var(--btn-hover); transform: translateY(-1px); box-shadow: 0 2px 4px rgba(0,0,0,0.04)}
+.opt.sel{border-color:var(--border-sel);background:var(--btn-sel); box-shadow: 0 0 0 1px var(--border-sel) inset;}
+.opt small{display:block;color:var(--dim);font-size:13.5px;margin-top:4px}
+.chk{display:flex;align-items:flex-start;gap:12px}
+.box{width:20px;height:20px;border:1px solid var(--line);border-radius:4px;flex:none;margin-top:2px;
+ display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--panel); background: var(--bg)}
+.opt.sel .box{background:var(--gold);border-color:var(--gold)}
+
+input,select,textarea{width:100%;background:var(--panel);border:1px solid var(--line);color:var(--cream);
+ padding:14px;border-radius:8px;font-family:inherit;font-size:16px;margin-bottom:9px; box-shadow: 0 1px 2px rgba(0,0,0,0.02) inset}
+input:focus,select:focus{outline:none;border-color:var(--gold); box-shadow: 0 0 0 1px var(--gold) inset}
+input[type="date"], input[type="time"]{ cursor: text; }
+label.fl{font-family:'IBM Plex Mono';font-size:10px;letter-spacing:.6px;text-transform:uppercase;color:var(--dim);
+ display:block;margin:12px 0 5px; font-weight: 500;}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+
+.rec{border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:24px; background: var(--panel); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);}
+.rec .top{background:var(--bg-alt);padding:26px 22px;text-align:center; border-bottom: 1px solid var(--line);}
+.rec .eyebrow{font-family:'IBM Plex Mono';font-size:10px;letter-spacing:1.2px;color:var(--gold);text-transform:uppercase;margin-bottom:9px; font-weight: 600;}
+.rec .name{font-family:'Big Shoulders Display';font-weight:800;font-size:38px;line-height:1;letter-spacing:-.4px; color: var(--ink)}
+.rec .price{font-family:'Big Shoulders Display';font-weight:800;font-size:40px;color:var(--hi);line-height:1;margin-top:14px}
+.rec .note{color:var(--dim);font-size:13px;margin-top:10px;line-height:1.45}
+.rec .body{padding:24px 22px;}
+.rec .body p{font-size:15px;margin-bottom:12px; color: var(--cream)}
+.rec .body p:last-child{margin-bottom:0}
+
+.inc{list-style:none;margin-top:12px; margin-bottom: 20px;}
+.inc li{font-size:14px;color:var(--ink);padding:8px 0 8px 24px;position:relative;border-bottom:1px solid var(--bg-alt)}
+.inc li:last-child{border:0}
+.inc li:before{content:'';position:absolute;left:4px;top:16px;width:6px;height:6px;background:var(--gold);border-radius:50%}
+
+.missing-list { list-style:none; margin-top: 8px; margin-bottom: 16px; opacity: 0.8;}
+.missing-list li { font-size:14px; color:var(--dim); padding:6px 0 6px 24px; position:relative; text-decoration: line-through;}
+.missing-list li:before { content:'✕'; position:absolute; left:4px; top:6px; font-size: 10px; color: var(--warn); }
+
+.alt{border:1px solid var(--line);border-radius:12px;padding:24px 22px;margin-bottom:24px;background:var(--panel); box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.03);}
+.alt b{font-family:'IBM Plex Mono';font-size:10px;letter-spacing:.7px;text-transform:uppercase;color:var(--dim);display:block;margin-bottom:6px; font-weight: 500}
+.alt .alt-name{font-family:'Big Shoulders Display';font-weight:800;font-size:28px;line-height:1;letter-spacing:-.4px; color: var(--ink); margin-bottom: 4px;}
+.alt .r{font-family:'IBM Plex Mono';color:var(--gold);font-size:18px; font-weight: 600; display:block; margin-bottom: 16px;}
+.flag{border:1px solid #fca5a5;background:#fef2f2;border-radius:8px;padding:16px 18px;margin-bottom:14px;font-size:14.5px; color: #991b1b}
+.flag b{color:var(--warn);font-family:'IBM Plex Mono';font-size:10px;letter-spacing:.7px;text-transform:uppercase;display:block;margin-bottom:7px; font-weight: 500}
+
+.btn-book { display: block; width: 100%; background: var(--gold); color: var(--ink); border: 0; padding: 16px; border-radius: 8px; font-family: 'Big Shoulders Display'; font-weight: 700; font-size: 22px; letter-spacing: .5px; cursor: pointer; box-shadow: 0 4px 6px rgba(216, 178, 88, 0.3); transition: .15s ease; text-align: center; }
+.btn-book:hover { background: var(--hi); transform: translateY(-2px); box-shadow: 0 6px 10px rgba(216, 178, 88, 0.4); }
+.btn-book.alt-book { background: var(--panel); border: 2px solid var(--gold); box-shadow: none; color: var(--ink); }
+.btn-book.alt-book:hover { background: var(--btn-hover); transform: translateY(-1px); }
+
+.out{border-radius:12px;padding:36px 24px;text-align:center;margin-bottom:14px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);}
+.out.book{background:var(--gold);color:var(--ink)}
+.out h2{font-family:'Big Shoulders Display';font-weight:800;font-size:36px;line-height:1.05;margin-bottom:12px}
+.out p{font-size:16px;opacity:.9}
+
+.nav{position:fixed;bottom:0;left:0;right:0;background:var(--bg);border-top:1px solid var(--line);padding:13px 20px;z-index:40; box-shadow: 0 -4px 6px -1px rgba(0,0,0,0.02)}
+.nav-in{max-width:540px;margin:0 auto;display:flex;gap:10px}
+.next{flex:1;background:var(--gold);color:var(--ink);border:0;padding:15px;border-radius:8px;
+ font-family:'Big Shoulders Display';font-weight:700;font-size:20px;letter-spacing:.4px;cursor:pointer; box-shadow: 0 2px 4px rgba(216, 178, 88, 0.2); transition: .15s ease}
+.next:hover:not(:disabled) { background: var(--hi); transform: translateY(-1px); box-shadow: 0 4px 6px rgba(216, 178, 88, 0.25)}
+.next:disabled{background:var(--line);color:var(--dim);cursor:not-allowed; box-shadow: none; transform: none}
+
+/* Chat Widget */
+.chat-widget { position: fixed; bottom: 80px; right: 20px; width: 320px; max-height: 400px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); display: flex; flex-direction: column; transform: translateY(20px); opacity: 0; pointer-events: none; transition: .2s ease; z-index: 50; overflow: hidden; }
+.chat-widget.open { transform: translateY(0); opacity: 1; pointer-events: all; }
+.chat-header { background: var(--bg-alt); padding: 12px 16px; border-bottom: 1px solid var(--line); font-family: 'IBM Plex Mono'; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--ink); font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+.chat-close { background: none; border: none; font-size: 18px; cursor: pointer; color: var(--dim); line-height: 1; padding: 0 4px; }
+.chat-body { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; background: var(--bg); }
+.chat-msg { font-size: 14px; padding: 10px 14px; border-radius: 8px; max-width: 85%; line-height: 1.4; }
+.chat-msg.bot { background: var(--panel); border: 1px solid var(--line); color: var(--cream); align-self: flex-start; box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
+.chat-msg.bot b { color: var(--gold); }
+.chat-msg.user { background: var(--gold); color: var(--ink); align-self: flex-end; }
+.chat-input-area { padding: 12px; border-top: 1px solid var(--line); display: flex; gap: 8px; background: var(--panel); }
+.chat-input { flex: 1; margin: 0; padding: 8px 12px; box-shadow: none; border-radius: 6px; }
+.chat-send { background: var(--ink); color: var(--panel); border: none; padding: 0 12px; border-radius: 6px; cursor: pointer; font-family: 'IBM Plex Mono'; font-size: 10px; text-transform: uppercase; font-weight: 600; }
+.chat-send:disabled { background: var(--line); cursor: not-allowed; }
+.chat-toggle { position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; border-radius: 25px; background: var(--ink); color: var(--gold); border: none; font-size: 24px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center; z-index: 45; transition: .2s ease; }
+.chat-toggle:hover { transform: scale(1.05); }
+</style>
+</head>
+<body>
+<div class="bar">
+ <div class="bar-in">
+    <div class="mark"><img src="bigdawgs-badge-lightgray-600dpi.jpg" alt="Big Dawgs Logo">BIG DAWGS</div>
+ </div>
+ <div class="bar-in" style="display:block"><div class="prog"><i id="bar"></i></div><div class="crumb" id="crumb"></div></div>
+</div>
+<div class="wrap"><div id="screen"></div></div>
+<div class="nav" id="bottomNav"><div class="nav-in">
+ <button class="next" id="next" onclick="next()">Continue</button></div></div>
+
+<!-- Chat Assistant Widget -->
+<button class="chat-toggle" onclick="toggleChat()" id="chatToggle">💬</button>
+<div class="chat-widget" id="chatWidget">
+    <div class="chat-header">
+        Ask a Detailer
+        <button class="chat-close" onclick="toggleChat()">&times;</button>
+    </div>
+    <div class="chat-body" id="chatBody">
+        <div class="chat-msg bot">Got questions about your quote or our process? Ask away. I'm here to help.</div>
+    </div>
+    <div class="chat-input-area">
+        <input type="text" class="chat-input" id="chatInput" placeholder="e.g., What is clay bar?" onkeypress="if(event.key==='Enter') sendChatMessage()">
+        <button class="chat-send" id="chatSend" onclick="sendChatMessage()">Send</button>
+    </div>
+</div>
+
+<script>
+let A={},idx=0,fired=null;
+const P=new URLSearchParams(location.search);
+if(P.get('type'))A.type=P.get('type');
+if(P.get('src'))A.src=P.get('src');
+
+// INDEPENDENT PACKAGES: Nothing says "Includes everything in X". Each stands on its own.
+const AUTO_PKG={
+ exp   :{n:'Express Exterior',   p:{car:89,truck:99,van:109},   inc:['Foam wash and hand dry','Wheels, tires, and wheel wells cleaned','Windows and door jambs cleaned','Tire dressing applied']},
+ decon :{n:'Exterior Decon',     p:{car:149,truck:169,van:189},  inc:['Foam wash and hand dry','Wheels, tires, and wheel wells cleaned', 'Clay bar decontamination treatment','Iron and tar chemical removal','6-month protective paint sealant']},
+ int   :{n:'Complete Interior',  p:{car:129,truck:149,van:169},  inc:['Full interior vacuum including seats and carpet','All hard surfaces wiped down and dressed','Interior windows cleaned','Door panels and center console detailed']},
+ intdeep:{n:'Deep Interior Restore',p:{car:249,truck:279,van:309},inc:['Full interior vacuum including seats and carpet','All hard surfaces wiped down and dressed','Hot water extraction on carpet and cloth seats','Leather cleaned and conditioned','Professional odor treatment']},
+ extrest:{n:'Exterior Restore',p:{car:279,truck:319,van:359},inc:['Foam wash, clay bar, and iron decontamination', 'One-step machine polish on all painted surfaces','Swirls and light scratches knocked down','6-month protective paint sealant']},
+ std   :{n:'Standard',            p:{car:179,truck:219,van:249},  inc:['Foam wash, hand dry, and wheels cleaned','Full interior vacuum and surface wipe-down','Windows cleaned inside and out','Tire dressing applied']},
+ sig   :{n:'Signature',          p:{car:249,truck:299,van:339},  inc:['Foam wash and hand dry', 'Clay bar and iron decontamination','6-month protective paint sealant', 'Full interior vacuum and surface wipe-down', 'Interior deep clean and dressing application']},
+ elite :{n:'Elite',              p:{car:379,truck:449,van:509},  inc:['Foam wash, clay bar, and iron decontamination','One-step machine polish on painted surfaces','6-month protective paint sealant','Hot water extraction on interior carpets/cloth','Leather cleaned and conditioned','Engine bay cleaned and dressed']}
+};
+
+const AUTO_SYMPTOMS=[
+ {id:'pets',   q:'Pets ride in it',                 add:40, in:1},
+ {id:'trash',  q:'Trash and clutter to clear out',  add:30, in:1},
+ {id:'lights', q:'Headlights are foggy or yellow',  add:69, out:1},
+ {id:'trim',   q:'Black trim has faded to grey',    add:39, out:1},
+ {id:'spots',  q:"Water spots that won't wipe off", add:59, out:1}
+];
+const BOAT_BANDS=[{id:'u20',l:'Under 20 ft',ft:18},{id:'b25',l:'20 – 25 ft',ft:23},{id:'b30',l:'26 – 30 ft',ft:28},
+ {id:'b36',l:'31 – 36 ft',ft:34},{id:'b45',l:'37 – 45 ft',ft:41},{id:'o45',l:'Over 45 ft',ft:48,hand:1}];
+const BOAT_TABLE={u20:{wash:[200,260],int:[260,300],L1:[600,700],L2:[700,850],L3:[850,1050]},
+ b25:{wash:[220,300],int:[280,375],L1:[650,950],L2:[850,1200],L3:[1050,1450]},
+ b30:{wash:[280,380],int:[350,460],L1:[850,1250],L2:[1100,1550],L3:[1400,1900]},
+ b36:{wash:[340,460],int:[420,560],L1:[1050,1550],L2:[1350,1900],L3:[1700,2350]},
+ b45:{wash:[400,580],int:[500,700],L1:[1300,1900],L2:[1650,2300],L3:[2100,2900]}};
+const BOAT_STYLES=[{id:'pontoon',l:'Pontoon or tritoon',w:[0,.65]},{id:'bow',l:'Bowrider or deck boat',w:[0,.65]},
+ {id:'console',l:'Center console or fishing',w:[0,.65]},{id:'cuddy',l:'Cuddy cabin or walkaround',w:[.2,.85]},
+ {id:'cruiser',l:'Express or cabin cruiser',w:[.35,1]},{id:'other',l:'Something else',w:[.15,.9]}];
+const BOAT_SYMPTOMS=[
+ {id:'ring',   q:'Brown or black ring along the waterline', ft:[6,9]},
+ {id:'deck',   q:'Deck floor is stained or greyed',         ft:[5,8]},
+ {id:'rust',   q:'Rust specks on the rails or hardware',    ft:[4,6]},
+ {id:'glass',  q:'Clear vinyl windows are hazy',            flat:[80,140]},
+ {id:'canvas', q:'Bimini or canvas top is dirty',           flat:[95,175]},
+ {id:'logs',   q:'Pontoon logs are stained or chalky',      ft:[10,14], onlyStyle:'pontoon'}
+];
+
+const RV_BANDS=[{id:'u25',l:'Under 25 ft',ft:22},{id:'r32',l:'26 – 32 ft',ft:29},{id:'r38',l:'33 – 38 ft',ft:36},
+ {id:'r45',l:'39 – 45 ft',ft:42},{id:'ro45',l:'Over 45 ft',ft:48,hand:1}];
+const RV_TABLE={u25:{wash:[175,225],seal:[225,290],full:[450,600],ox:[650,850]},
+ r32:{wash:[200,260],seal:[260,320],full:[560,720],ox:[850,1100]},
+ r38:{wash:[240,300],seal:[300,370],full:[680,860],ox:[1050,1350]},
+ r45:{wash:[280,340],seal:[350,420],full:[800,1000],ox:[1250,1600]}};
+const RV_SYMPTOMS=[
+ {id:'awning', q:'Awnings need cleaning',                   flat:[45,150]},
+ {id:'windows',q:'Foggy windows or skylights',              flat:[75,150]},
+ {id:'seals',  q:'Slide seals are dry or cracking',         flat:[75,150]}
+];
+const MARINAS=['Highport','Grandpappy Point','Catfish Bay','Alberta Creek','Buncombe Creek','Lil Mineral','Big Water','Somewhere else'];
+
+const r5=n=>Math.round(n/5)*5, money=n=>'$'+n.toLocaleString();
+const span=r=>r[0]===r[1]?money(r[0]):money(r[0])+' – '+money(r[1]);
+const list=a=>a.length===1?a[0]:a.length===2?a[0]+' and '+a[1]:a.slice(0,-1).join(', ')+', and '+a.slice(-1);
+const feet=()=>{const t=A.type==='boat'?BOAT_BANDS:RV_BANDS;const b=t.find(x=>x.id===A.band);return b?b.ft:0;};
+const bandObj=()=>(A.type==='boat'?BOAT_BANDS:RV_BANDS).find(x=>x.id===A.band);
+const sym=()=>A.type==='auto'?AUTO_SYMPTOMS:A.type==='boat'?BOAT_SYMPTOMS.filter(c=>!c.onlyStyle||A.style===c.onlyStyle):RV_SYMPTOMS;
+const chosen=()=>sym().filter(c=>A['s_'+c.id]);
+function weight(rng,w){const sp=rng[1]-rng[0];return[r5(rng[0]+sp*w[0]),r5(rng[0]+sp*w[1])];}
+
+function recommend(){
+  const S=chosen().map(c=>c.id);
+  const has=id=>S.includes(id);
+
+  if(A.type==='auto'){
+    const cls=A.class||'car';
+    const E=+A.ext, I=+A.int;                  
+    if(!E&&!I) return {nothing:true};
+    let key, why=[];
+
+    if(!E)      key = I<=2 ? 'int' : 'intdeep';                       
+    else if(!I) key = E===1?'exp' : E===2?'decon' : 'extrest';        
+    else if(E>=3||I>=3) key='elite';
+    else if(E===2||I===2) key='sig';
+    else key='std';
+
+    let pkg=AUTO_PKG[key], base=pkg.p[cls];
+    const addOn=chosen().reduce((a,c)=>a+(c.add||0),0);
+    const covered=key==='elite'||key==='intdeep'||key==='extrest';
+    let surcharge=covered?Math.round(addOn*0.4):addOn;
+
+    const EW={1:'The paint is fine, it is just dirty. That is a wash, not correction work, and you should not pay correction prices for it.',
+              2:'Water not beading anymore means the protection is gone. Decontamination and a sealant, so it stays looking right instead of two weeks.',
+              3:'Swirls you catch in the sun are the one thing washing cannot fix. That takes a machine polish, and that is what moves this up.',
+              4:'Dull or sat-under-a-tree paint is a full reset. This is the job where saving fifty dollars costs you the result.'};
+    const IW={1:'Inside is already clean, so this is a refresh. No reason to pay for a restore you do not need.',
+              2:'Normal lived-in is the everyday job. Full vacuum, every surface, windows.',
+              3:'Used hard means the dirt is in the carpet, not on it. That takes extraction, not a vacuum.',
+              4:'Something set in. Stains and smell come out with hot water extraction and an odor treatment, and that is priced in.'};
+    if(E) why.push(EW[E]); else why.push('You said the outside is fine, so nothing out there gets touched and you are not paying for it.');
+    if(I) why.push(IW[I]); else why.push('You said the inside is fine. Leaving it alone, and leaving it off your bill.');
+    const heavy=chosen().filter(c=>c.add>0).map(c=>c.q.toLowerCase());
+    if(heavy.length) why.push('You flagged '+list(heavy)+'. That is extra hours on the same job, and it is already in the number — not a surprise at the truck.');
+
+    const LADDER={exp:'decon',decon:'extrest',int:'intdeep',std:'sig',sig:'elite'};
+    const altMap={std:{k:'sig',t:'Step up'},sig:{k:'elite',t:'Step up'},elite:{k:'sig',t:'Lighter option'},
+                  int:{k:'intdeep',t:'Step up'},intdeep:{k:'int',t:'Lighter option'},
+                  exp:{k:'decon',t:'Step up'},decon:{k:'extrest',t:'Step up'},extrest:{k:'decon',t:'Lighter option'}};
+    let total=base+surcharge, crossover=null;
+    const up=LADDER[key];
+    if(up&&total+60>=AUTO_PKG[up].p[cls]&&AUTO_PKG[up].p[cls]>total){
+      crossover={from:pkg.n,was:total};
+      key=up; pkg=AUTO_PKG[up]; base=pkg.p[cls]; surcharge=0; total=base;
+    }
+    const alt=altMap[key];
+    return {key,name:pkg.n,inc:pkg.inc,exact:true,price:[total,total],base,surcharge,why,crossover,
+      alt:alt?{k:alt.k, t:alt.t, n:AUTO_PKG[alt.k].n, p:money(AUTO_PKG[alt.k].p[cls]), inc:AUTO_PKG[alt.k].inc}:null,
+      ceramic:(key==='elite'||key==='sig'||key==='extrest')&&E<4,
+      correction:E===4, spread:0};
+  }
+
+  if(A.type==='boat'){
+    const b=bandObj(); if(b&&b.hand) return {hand:'Over 45 feet is priced by hand every time. Too much variation to put a number on it from a form.'};
+    const row=BOAT_TABLE[A.band], st=BOAT_STYLES.find(x=>x.id===A.style), w=st?st.w:[.15,.9];
+    const H=+A.hull, N=+A.bint;               
+    if(!H&&!N) return {nothing:true};
+    let key,name,why=[],r=[0,0];
+
+    if(H){
+      const lvl = H===1?0 : H===2?1 : H===3?2 : 3;
+      key = lvl===0?'wash':'L'+lvl;
+      name = lvl===0?'Wash and Protect':'Exterior Revival — Level '+lvl;
+      r=weight(row[key],w);
+    }
+    if(N){
+      let ir=weight(row.int,w);
+      if(N===1) ir=[r5(ir[0]*.7),r5(ir[1]*.8)];
+      if(N===3) ir=[r5(ir[0]*1.15),r5(ir[1]*1.3)];
+      r=[r[0]+ir[0],r[1]+ir[1]];
+      if(!H){key='int';name='Interior Detail';}
+      else name+=' + Interior';
+    }
+    chosen().forEach(c=>{ if(c.ft)r=[r[0]+r5(c.ft[0]*feet()),r[1]+r5(c.ft[1]*feet())];
+                          else if(c.flat)r=[r[0]+c.flat[0],r[1]+c.flat[1]]; });
+
+    const HW={1:'The gelcoat still has its gloss and water still beads. Clean and protect, not correction. You should not be paying correction prices for this.',
+              2:'It shines but the water stopped beading, so the protection is spent. A cleaner wax puts it back before the sun takes the gloss.',
+              3:'Dull on the sun-facing sides but not chalked yet is a machine polish. This is the window where it still comes back easy.',
+              4:'Chalk on your hand means the gelcoat is oxidized through. Compound, polish, then seal. There is no shortcut and a wash will not touch it.'};
+    const NW={1:'Inside just needs wiped down. That is a light touch and it is priced like one.',
+              2:'A season of use is the normal job. Every surface, the vinyl, the flooring, the lockers.',
+              3:'Mildew and set-in stains in the vinyl are the slow part. It comes out, but it is hand work, and that is where the hours go.'};
+    if(H) why.push(HW[H]); else why.push('You said the outside is fine. Not touching it, not charging for it.');
+    if(N) why.push(NW[N]); else why.push('You said the inside is fine, so this is exterior only.');
+    if(A.lives==='slip') why.push('Working it in the slip means everything happens off the dock. Slower than a trailer, and it is priced in — no day-of surprise.');
+    const flagged=chosen().map(c=>c.q.toLowerCase());
+    if(flagged.length) why.push('You flagged '+list(flagged)+'.');
+
+    return {key,name,inc:boatInc(key,N?'both':'out'),exact:false,price:[r5(r[0]),r5(r[1])],why,
+      ceramic:(key==='L2'||key==='L3'), spread:Math.round((r[1]/r[0]-1)*100),
+      whyRange: key==='L3'?'Some hulls come back in two passes. Some take four. That is the whole spread.':
+                key==='L2'?'Where it lands depends on how the gelcoat responds to the first pass.':
+                key==='int'?'Depends what is set into the vinyl versus sitting on top of it.':
+                            'Predictable work. The spread just covers how much is actually on it.'};
+  }
+
+  if(A.type==='rv'){
+    const b=bandObj(); if(b&&b.hand) return {hand:'Over 45 feet is priced by hand. Too much variation to put a number on it from a form.'};
+    const row=RV_TABLE[A.band], cond=A.cond;
+    const key = cond==='film'?'seal':cond==='flat'?'full':cond==='chalk'?'ox':'seal';
+    const name={seal:'Wash and Seal',full:'Full Exterior Detail',ox:'Oxidation Removal'}[key];
+    let r=[...row[key]];
+    const roof = A.roof!=='recent';
+    if(roof){const p=feet()>30?225:175;r=[r[0]+p,r[1]+p];}
+    chosen().forEach(c=>{ if(c.ft)r=[r[0]+r5(c.ft[0]*feet()),r[1]+r5(c.ft[1]*feet())];
+                          else if(c.flat)r=[r[0]+c.flat[0],r[1]+c.flat[1]]; });
+    const why=[];
+    if(key==='seal')why.push('Sidewalls are carrying road film and bugs, nothing worse. Wash plus a sealant so the next one comes off easier — that is the whole job.');
+    if(key==='full')why.push('The sidewalls have gone flat. Wash, decontaminate, machine polish, then seal. This is the stage where the gloss still comes back without a full cut.');
+    if(key==='ox')  why.push('Chalk that comes off on your hand means the clear coat is oxidized. Multi-step machine work, and over 35 feet that is a two-day job.');
+    if(A.roof==='streaks') why.push('Those streaks are coming off the roof, not the sidewalls. Cleaning the sides without the roof means they are back by fall, so the roof is in the price.');
+    else if(A.roof==='old')why.push('A year or more without a roof cleaning is where the streaks and the seal problems start. Roof is in the price, and we tell you what the seals look like while we are up there.');
+    else if(A.roof==='idk')why.push('Most people never get up there. We will, it is in the price, and you get told straight what the seals look like.');
+    else                   why.push('Roof was done recently, so it is left off and left off your bill.');
+    const flagged=chosen().map(c=>c.q.toLowerCase());
+    if(flagged.length) why.push('You flagged '+list(flagged)+'.');
+    return {key,name,inc:rvInc(key,roof),exact:false,price:[r5(r[0]),r5(r[1])],why,
+      ceramic:(key==='full'||key==='ox'),
+      spread:Math.round((r[1]/r[0]-1)*100),
+      whyRange: key==='ox'?'Some sidewalls come back in two passes. Some take four.':
+                key==='full'?'Depends how much gloss is left to bring back.':
+                             'Predictable work. The spread covers road film and bug load.'};
+  }
+  return {hand:'Multiple vehicles get a real proposal, not a form price.'};
+}
+
+function boatInc(k,want){
+  const base={wash:['Full wash, hull and topside','Waterline scrub','Vinyl wiped down','Spray sealant on the gelcoat'],
+   L1:['Wash and decontamination','Cleaner wax by machine','Metal polished','Vinyl cleaned and conditioned'],
+   L2:['Wash and decontamination','Machine polish, single stage','Gelcoat sealed','Metal polished','Vinyl cleaned and conditioned'],
+   L3:['Wash and decontamination','Compound, then polish, then seal','Oxidation removed to bare gloss','Metal polished','Vinyl cleaned and conditioned'],
+   int:['Every surface vacuumed and wiped','Vinyl cleaned and conditioned','Carpet or snap-in flooring cleaned','Lockers, helm, and cupholders']}[k]||[];
+  return want==='both'&&k!=='int'?base.concat(['Full interior detail included']):base;
+}
+function rvInc(k,roof){
+  const base={seal:['Sidewalls, front cap, and rear washed','Bugs removed from the cap','Windows cleaned','Spray sealant on the sidewalls'],
+   full:['Wash and decontamination','Machine polish on the sidewalls','Sealant applied','Wheels and wells cleaned'],
+   ox:['Wash and decontamination','Compound, then polish, then seal','Oxidation removed','Wheels and wells cleaned']}[k]||[];
+  return roof?base.concat(['Roof washed and conditioned','Seal condition reported back to you']):base;
+}
+
+function outcome(){
+  const R=recommend();
+  const rule=(n,t,r)=>{fired={n,t,r};return r;};
+  if(A.type==='fleet')            return rule(1,'Fleet — always a real proposal','quote');
+  if(R.hand)                      return rule(2,'Over max length','quote');
+  if(A.type==='auto'&&R.correction)return rule(3,'Paint correction — needs eyes on the panel','quote');
+  if(A.type==='auto')             return rule(4,'Auto — price is exact','book');
+  if(A.type==='boat'&&R.key==='wash'&&feet()<31&&A.lives==='trailer')
+                                  return rule(5,'Boat wash, '+feet()+' ft, on a trailer','book');
+  if(A.type==='rv'&&R.key==='seal'&&feet()<33)
+                                  return rule(6,'RV wash and seal, '+feet()+' ft','book');
+  return rule(7,'Range is wide enough that it needs eyes on it','quote');
+}
+
+function buildSteps(){
+  if(!A.type) return ['type'];
+  if(A.type==='fleet') return ['type','f_count','f_kind','f_freq','contact','outcome'];
+  if(A.type==='auto')  return ['type','a_class','a_ext','a_int','symptoms','rec','contact','outcome'];
+  const over=()=>{const b=bandObj();return b&&b.hand;};
+  if(A.type==='boat'){
+    const s=['type','b_len'];
+    if(over()) return s.concat(['rec','contact','outcome']);   
+    return s.concat(['b_style','b_lives','b_hull','b_int','symptoms','rec','contact','outcome']);
+  }
+  if(A.type==='rv'){
+    const s=['type','r_len'];
+    if(over()) return s.concat(['rec','contact','outcome']);
+    return s.concat(['r_rig','r_cond','r_roof','symptoms','rec','contact','outcome']);
+  }
+  return ['type'];
+}
+
+const T={
+type:{h:'What are we working on?',k:'type',o:[
+  {v:'auto',l:'Car, truck, or SUV'},{v:'boat',l:'Boat or pontoon'},
+  {v:'rv',l:'RV, camper, or travel trailer'},{v:'fleet',l:'More than one vehicle'}]},
+
+a_class:{h:'Which one?',k:'class',o:[
+  {v:'car',l:'Car or small SUV'},{v:'truck',l:'Truck or large SUV'},{v:'van',l:'Van or three-row'}]},
+a_ext:{h:'How does the paint look?',sub:'Walk out to it dry and look down the side. Whichever is closest.',k:'ext',o:[
+  {v:'1',l:'Looks good. Just dirty.',s:'Still glossy, water beads when it rains'},
+  {v:'2',l:'Clean, but water stopped beading',s:'Protection has worn off'},
+  {v:'3',l:'Light swirls and scratches',s:'You mostly see them in direct sun'},
+  {v:'4',l:'Dull, faded, or been sitting under a tree',s:'Lost its gloss, maybe sap or spots baked in'},
+  {v:'0',l:'Nothing wrong with it',s:'Leave the outside alone'}]},
+a_int:{h:'How does the inside look?',sub:'Same thing. Honest answer gets you the right number.',k:'int',o:[
+  {v:'1',l:'Clean. Just needs a refresh.',s:'Kept up, wiped down regularly'},
+  {v:'2',l:'Normal lived-in',s:'Crumbs, dust, a few spots'},
+  {v:'3',l:'It gets used hard',s:'Kids, dogs, or a work truck'},
+  {v:'4',l:'Something spilled and set in',s:'Stains, or it smells'},
+  {v:'0',l:'Nothing wrong with it',s:'Leave the inside alone'}]},
+
+b_len:{h:'How long is it?',k:'band',o:BOAT_BANDS.map(b=>({v:b.id,l:b.l}))},
+b_style:{h:'What kind of boat?',k:'style',o:BOAT_STYLES.map(b=>({v:b.id,l:b.l}))},
+b_lives:{h:'Where does it live?',k:'lives',o:[
+  {v:'trailer',l:'On a trailer at my place'},{v:'slip',l:'In the water at a slip'},
+  {v:'lift',l:'On a lift'},{v:'storage',l:'Covered or dry storage'}]},
+b_hull:{h:'Walk up to it dry. How does the hull look?',
+ sub:'This is the answer that moves the price the most, so take a second on it.',k:'hull',o:[
+  {v:'1',l:'It shines. It is just dirty.',s:'Water still beads when it rains'},
+  {v:'2',l:'Shines, but water stopped beading',s:'Protection has worn off'},
+  {v:'3',l:'Dull and hazy on the sunny sides',s:'Lost its depth but still smooth'},
+  {v:'4',l:'Chalky. It comes off on my hand.',s:'Faded and no longer glossy'},
+  {v:'0',l:'Nothing wrong with it',s:'Leave the outside alone'}]},
+b_int:{h:'How does the inside look?',k:'bint',o:[
+  {v:'1',l:'Just needs wiped down',s:'Kept covered, used lightly'},
+  {v:'2',l:'Been out on it all season',s:'Dirty, sunscreen, lake water, drinks'},
+  {v:'3',l:'Mildew spots or stains in the vinyl',s:'Set in, not wiping off'},
+  {v:'0',l:'Nothing wrong with it',s:'Leave the inside alone'}]},
+
+r_len:{h:'How long is it?',k:'band',o:RV_BANDS.map(b=>({v:b.id,l:b.l}))},
+r_rig:{h:'What kind of rig?',k:'rig',o:[
+  {v:'tt',l:'Travel trailer'},{v:'fw',l:'Fifth wheel'},{v:'a',l:'Class A motorhome'},
+  {v:'c',l:'Class C motorhome'},{v:'b',l:'Class B or camper van'},{v:'th',l:'Toy hauler'}]},
+r_cond:{h:'How do the sidewalls look?',sub:'This is the answer that sets the price.',k:'cond',o:[
+  {v:'film', l:'Fine. Road film and bugs.',s:'Still glossy underneath'},
+  {v:'flat', l:'Flat. Lost the shine.',s:'Clean but no depth left'},
+  {v:'chalk',l:'Chalky. It comes off on my hand.',s:'Oxidized'}]},
+r_roof:{h:'What is going on with the roof?',
+ sub:'Streaks down the sides almost always start up top.',k:'roof',o:[
+  {v:'streaks',l:'Black streaks running down the sides'},
+  {v:'old',l:'Have not been up there in over a year'},
+  {v:'idk',l:'No idea. I do not get up there.'},
+  {v:'recent',l:'It was cleaned not long ago'}]},
+
+f_count:{h:'How many vehicles?',k:'fcount',o:[
+  {v:'2-5',l:'2 – 5'},{v:'6-15',l:'6 – 15'},{v:'16-40',l:'16 – 40'},{v:'40+',l:'40 or more'}]},
+f_kind:{h:'What kind?',k:'fkind',o:[
+  {v:'pickups',l:'Pickups and vans'},{v:'box',l:'Box trucks'},{v:'heavy',l:'Heavy equipment'},
+  {v:'dealer',l:'Dealership inventory'},{v:'mixed',l:'Mixed'}]},
+f_freq:{h:'How often?',k:'ffreq',o:[
+  {v:'once',l:'One time'},{v:'month',l:'Monthly'},{v:'2wk',l:'Every two weeks'},{v:'wk',l:'Weekly'}]}
+};
+
+function render(){
+  const steps=buildSteps(); if(idx>=steps.length)idx=steps.length-1;
+  const id=steps[idx]; let h='<div class="step">';
+  const nav = document.getElementById('bottomNav');
+
+  if(id==='symptoms')      h+=scrSymptoms();
+  else if(id==='rec')      h+=scrRec();
+  else if(id==='contact')  h+=scrContact();
+  else if(id==='outcome')  h+=scrOutcome();
+  else{
+    const c=T[id];
+    h+=`<h1>${c.h}</h1>`+(c.sub?`<div class="sub">${c.sub}</div>`:'');
+    c.o.forEach(o=>{h+=`<button class="opt${A[c.k]===o.v?' sel':''}" onclick="pick('${c.k}','${o.v}')">
+      ${o.l}${o.s?`<small>${o.s}</small>`:''}</button>`;});
+  }
+  h+='</div>';
+  document.getElementById('screen').innerHTML=h;
+  document.getElementById('bar').style.width=(idx/(steps.length-1)*100)+'%';
+  document.getElementById('crumb').textContent=`Step ${idx+1} of ${steps.length} · ${id}`;
+  
+  const nx=document.getElementById('next');
+  nx.disabled=!canAdvance(id);
+  
+  // Only show the bottom navigation on screens that require multi-selection or typing.
+  // Single-choice questions (and the rec/outcome screens) hide the nav bar for auto-advance.
+  if(id === 'symptoms' || id === 'contact') {
+      nav.style.display = 'block';
+  } else {
+      nav.style.display = 'none';
+  }
+
+  nx.textContent = id==='symptoms'?(chosen().length?'Continue':'None of these apply')
+    : id==='contact'?'Submit Booking Request':'Continue';
+    
+  window.scrollTo(0,0); 
+}
+
+function scrSymptoms(){
+  const L=sym();
+  let h=`<h1>Anything on this list?</h1>
+   <div class="sub">Check whatever applies. I am not selling you these — they change how long the same job takes, so I would rather know now than find out in your driveway.</div>`;
+  L.forEach(c=>{const on=A['s_'+c.id];
+    h+=`<button class="opt${on?' sel':''}" onclick="tog('${c.id}')">
+      <span class="chk"><span class="box">${on?'✓':''}</span><span>${c.q}</span></span></button>`;});
+  return h;
+}
+
+function pickPkg(pkgName, pkgPrice) {
+    A.finalPkgName = pkgName;
+    A.finalPrice = pkgPrice;
+    next();
+}
+
+function scrRec(){
+  const R=recommend();
+  if(R.nothing) return `<h1>Then you do not need me yet</h1>
+    <div class="sub">You told me nothing is wrong inside or out. I am not going to invent a reason to take your money.</div>
+    <div class="flag"><b>Refresh the page to start over</b> if something actually is bugging you, pick the closest option and I will price it.</div>`;
+  if(R.hand) return `<h1>This one I price by hand</h1><div class="sub">${R.hand}</div>
+    <div class="flag"><b>Why no number</b>Putting a made-up range on this would just waste your time and mine.
+    Give me your details on the next screen and I will get you a real number in writing today.</div>
+    <button class="btn-book" onclick="pickPkg('Custom Hand Quote', 'TBD')">Continue to Details</button>`;
+    
+  let h=`<div class="rec"><div class="top">
+    <div class="eyebrow">What I'd put you in</div>
+    <div class="name">${R.name.toUpperCase()}</div>
+    <div class="price">${span(R.price)}</div>
+    <div class="note">${R.exact?'That is the exact price.'
+      :(R.whyRange||'')+'<br>You get the exact number in writing before anything starts.'}</div>
+   </div><div class="body">`;
+   
+  R.why.forEach(p=>h+=`<p>${p}</p>`);
+  h+=`<ul class="inc">`+R.inc.map(i=>`<li>${i}</li>`).join('')+`</ul>`;
+  if(R.surcharge>0) h+=`<p style="margin-top:14px;color:var(--dim);font-size:14px">
+    ${AUTO_PKG[R.key].n} is ${money(R.base)}. The condition work you flagged is the other ${money(R.surcharge)}.</p>`;
+    
+  // Main Book Button
+  h+=`<button class="btn-book" style="margin-top:20px;" onclick="pickPkg('${R.name}', '${span(R.price)}')">Book ${R.name} Now</button>`;
+  h+=`</div></div>`;
+  
+  if(R.correction) h+=`<div class="flag"><b>One thing</b>
+    Scratches and swirls are the only thing I will not price off a form. How much comes out depends on how thick the clear coat is,
+    and I cannot see that from here. I will look at it in person and tell you straight what will and will not come out.</div>`;
+    
+  // Lower Tier / Alternative package rendering with its own Book Button
+  if(R.alt) {
+      h+=`<div class="alt">
+            <b>${R.alt.t}</b>
+            <div class="alt-name">${R.alt.n}</div>
+            <span class="r">${R.alt.p}</span>
+            <p style="color:var(--cream);font-size:14px;margin-bottom:8px">If you want to save some money, we can step down to this package.</p>
+            <p style="color:var(--ink);font-weight:600;font-size:14px;margin-top:16px;">This Includes:</p>
+            <ul class="inc" style="margin-top:6px; margin-bottom:12px;">`;
+      
+      R.alt.inc.forEach(i => { h+= `<li>${i}</li>`; });
+      h+=`</ul>`;
+      
+      // Calculate what they miss out on by comparing arrays
+      if(R.inc && R.inc.length > 0) {
+          const missing = R.inc.filter(item => !R.alt.inc.includes(item));
+          if(missing.length > 0) {
+              h+= `<p style="color:var(--warn);font-weight:600;font-size:14px;">What you'll miss out on:</p>
+                   <ul class="missing-list">`;
+              missing.forEach(i => { h+= `<li>${i}</li>`; });
+              h+= `</ul>`;
+          }
+      }
+
+      h+=`<button class="btn-book alt-book" onclick="pickPkg('${R.alt.n}', '${R.alt.p}')">Book ${R.alt.n} Instead</button>
+          </div>`;
+  }
+  
+  return h;
+}
+
+function scrContact(){
+  const o=outcome();
+  let h=`<h1>Where and when</h1>
+   <div class="sub">Lock in your day and time, and give us the details on where the vehicle sits.</div>
+   
+   <div class="two">
+       <div>
+           <label class="fl">Preferred Date</label>
+           <input type="date" value="${A.date||''}" onchange="A.date=this.value;paint()" required>
+       </div>
+       <div>
+           <label class="fl">Preferred Time</label>
+           <input type="time" value="${A.time||''}" onchange="A.time=this.value;paint()" required>
+       </div>
+   </div>
+
+   <label class="fl">Name</label><input type="text" value="${A.name||''}" oninput="A.name=this.value;paint()">
+   <label class="fl">Phone</label><input type="tel" value="${A.phone||''}" oninput="A.phone=this.value;paint()">
+   <label class="fl">Email</label><input type="email" value="${A.email||''}" oninput="A.email=this.value;paint()">
+   <label class="fl">${A.type==='boat'&&A.lives==='slip'?'Marina':'Address where it sits'}</label>`;
+   
+  if(A.type==='boat'&&A.lives==='slip'){
+    h+=`<select onchange="A.marina=this.value;paint()"><option value="">Pick one</option>
+      ${MARINAS.map(m=>`<option${A.marina===m?' selected':''}>${m}</option>`).join('')}</select>
+      <label class="fl">Slip number</label><input type="text" value="${A.slip||''}" oninput="A.slip=this.value;paint()">`;
+  } else h+=`<input type="text" value="${A.addr||''}" oninput="A.addr=this.value;paint()">`;
+  
+  h+=`<label class="fl">Year, make, model</label>
+    <input type="text" placeholder="${A.type==='boat'?'2015 Bennington 22 SSX':A.type==='rv'?'2019 Jayco North Point':'2021 Silverado'}"
+     value="${A.desc||''}" oninput="A.desc=this.value;paint()">
+    <label class="fl">How did you hear about us</label>
+    <select onchange="A.src=this.value;paint()"><option value="">Pick one</option>
+     ${['Google','Facebook','Someone told me','Saw the truck','A marina or dealer','Other']
+       .map(s=>`<option${A.src===s?' selected':''}>${s}</option>`).join('')}</select>`;
+  return h;
+}
+
+function submitLead() {
+    // -----------------------------------------------------------------------------
+    // API INTEGRATION BLANKS
+    // -----------------------------------------------------------------------------
+    
+    const payload = {
+        customer: {
+            name: A.name,
+            phone: A.phone,
+            email: A.email,
+            address: A.addr || A.marina + " " + (A.slip || "")
+        },
+        vehicle: A.desc,
+        packageSelected: A.finalPkgName,
+        estimatedPrice: A.finalPrice,
+        requestedDate: A.date,
+        requestedTime: A.time,
+        source: A.src,
+        symptoms: chosen().map(c=>c.q).join(', ')
+    };
+
+    console.log("Preparing to send lead data:", payload);
+
+    /* 
+    // TODO: ZAPIER / MAKE WEBHOOK
+    // Link this to a Catch Hook in Zapier to route to any apps you want.
+    fetch('YOUR_ZAPIER_WEBHOOK_URL_HERE', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    }).catch(err => console.error("Webhook Error:", err));
+    */
+
+    /*
+    // TODO: HUBSPOT API
+    // Create a new Contact / Deal directly via HubSpot
+    fetch('https://api.hubapi.com/crm/v3/objects/contacts', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer YOUR_HUBSPOT_ACCESS_TOKEN', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ properties: { email: A.email, firstname: A.name, phone: A.phone } })
+    });
+    */
+
+    /*
+    // TODO: SETMORE API
+    // Create a customer / hold a slot
+    // Requires getting a token first from https://developer.setmore.com/
+    */
+
+    /*
+    // TODO: NOTIFICATION EMAIL (e.g., via SendGrid or Postmark)
+    // Send email to Heath.Turner@bigdawgsdetailing.us
+    fetch('https://api.sendgrid.com/v3/mail/send', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer YOUR_SENDGRID_API_KEY', 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            personalizations: [{ to: [{ email: "Heath.Turner@bigdawgsdetailing.us" }] }],
+            from: { email: "no-reply@bigdawgsdetailing.us" },
+            subject: "New Booking Request: " + A.finalPkgName,
+            content: [{ type: "text/plain", value: JSON.stringify(payload, null, 2) }]
+        })
+    });
+    */
+
+    /*
+    // TODO: GOOGLE TAG MANAGER / FACEBOOK PIXEL EVENT
+    if(typeof gtag === 'function') {
+        gtag('event', 'generate_lead', {
+            currency: 'USD',
+            value: payload.estimatedPrice.replace(/[^0-9.-]+/g,"") // strips dollar sign
+        });
+    }
+    */
+    
+    // Advance to final visual screen
+    idx++;
+    render();
+}
+
+function scrOutcome(){
+  // Final Success Screen presented to the customer.
+  return `<div class="out book">
+    <h2>YOU'RE ON THE BOOK</h2>
+    <p>We have received your request for the <b>${A.finalPkgName}</b> package.</p>
+    <p style="margin-top: 10px;">We'll see you on <b>${formatDate(A.date)}</b> at <b>${formatTime(A.time)}</b>.</p>
+    </div>
+    <div class="sub">If you have any immediate questions, or need to send photos of your vehicle, text us at (580) 916-5189.</div>`;
+}
+
+// Utility to make date look nice (e.g. 2024-10-15 -> Oct 15, 2024)
+function formatDate(dateStr) {
+    if(!dateStr) return "your requested date";
+    const [y, m, d] = dateStr.split('-');
+    return new Date(y, m-1, d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+// Utility to make time look nice (e.g. 14:30 -> 2:30 PM)
+function formatTime(timeStr) {
+    if(!timeStr) return "your requested time";
+    const [h, m] = timeStr.split(':');
+    let hours = parseInt(h);
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12; 
+    return hours + ':' + m + ' ' + ampm;
+}
+
+function canAdvance(id){
+  if(id==='rec') return !recommend().nothing;   
+  if(id==='symptoms'||id==='outcome')return true;
+  if(id==='contact'){
+    if(!(A.name&&A.phone&&A.email&&A.date&&A.time))return false;
+    if(A.type==='boat'&&A.lives==='slip')return !!A.marina;
+    return !!A.addr;
+  }
+  return !!A[T[id].k];
+}
+
+function pick(k,v){
+    A[k]=v;
+    render(); // Re-render immediately to show the golden selected state
+    
+    // Auto-advance after a tiny delay for visual confirmation on mobile
+    setTimeout(() => {
+        next();
+    }, 250);
+}
+
+function tog(id){A['s_'+id]=!A['s_'+id];render();}
+function paint(){document.getElementById('next').disabled=!canAdvance(buildSteps()[idx]);}
+
+function next(){
+    const s=buildSteps();
+    if(s[idx]==='contact') {
+        submitLead(); // Intercepts the move to Outcome to fire webhooks
+        return;
+    }
+    if(s[idx]==='outcome') return restart();
+    if(idx<s.length-1){
+        idx++;
+        render();
+    }
+}
+function restart(){A={};if(P.get('type'))A.type=P.get('type');idx=0;render();}
+
+let chatHistory = [];
+let isChatOpen = false;
+
+function toggleChat() {
+    isChatOpen = !isChatOpen;
+    document.getElementById('chatWidget').classList.toggle('open', isChatOpen);
+    document.getElementById('chatToggle').style.display = isChatOpen ? 'none' : 'flex';
+}
+
+function appendChatMessage(text, sender, id = null) {
+    const body = document.getElementById('chatBody');
+    const msg = document.createElement('div');
+    msg.className = `chat-msg ${sender}`;
+    if(id) msg.id = id;
+    msg.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+    body.appendChild(msg);
+    body.scrollTop = body.scrollHeight;
+}
+
+async function sendChatMessage() {
+    const input = document.getElementById('chatInput');
+    const text = input.value.trim();
+    if(!text) return;
+
+    appendChatMessage(text, 'user');
+    input.value = '';
+    document.getElementById('chatSend').disabled = true;
+
+    // TODO: Insert your valid Gemini API Key here if you wish to use the AI detailer chat widget.
+    const apiKey = ""; 
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+    if (!apiKey) {
+        setTimeout(() => {
+             appendChatMessage("The AI assistant is currently offline. Please configure the API Key in the source code.", 'bot');
+             document.getElementById('chatSend').disabled = false;
+        }, 500);
+        return;
+    }
+
+    let R = {}; if (A.type) R = recommend() || {};
+    const systemPrompt = `You are an expert detailer at Big Dawgs Detailing helping a customer understand their quote process. Keep answers to 1-2 short paragraphs max. Current Customer Context: Vehicle Type: ${A.type}, Package Recommended: ${R.name}. Answer specifically referencing their inputs.`;
+
+    chatHistory.push({ role: "user", parts: [{ text: text }] });
+    const payload = { contents: chatHistory, systemInstruction: { parts: [{ text: systemPrompt }] } };
+
+    try {
+        const loadingId = 'load-' + Date.now();
+        appendChatMessage("Typing...", 'bot', loadingId);
+
+        const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        const loadEl = document.getElementById(loadingId); if(loadEl) loadEl.remove();
+
+        if (response.ok) {
+             const result = await response.json();
+             if (result.candidates && result.candidates[0].content) {
+                 const botText = result.candidates[0].content.parts[0].text;
+                 appendChatMessage(botText, 'bot');
+                 chatHistory.push({ role: "model", parts: [{ text: botText }] });
+             }
+        }
+    } catch (error) {
+        console.error("Chat error:", error);
+    } finally {
+        document.getElementById('chatSend').disabled = false;
+    }
+}
+
+render();
+</script>
+</body>
+</html>
