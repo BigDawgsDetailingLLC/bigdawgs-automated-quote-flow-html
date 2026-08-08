@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Big Dawgs — Quote Flow</title>
 <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<!-- HubSpot tracking script — sets the hubspotutk cookie so form submissions
+     from real browsers aren't dropped as suspected-bot traffic. Portal 245895086. -->
+<script type="text/javascript" id="hs-script-loader" async defer src="//js.hs-scripts.com/245895086.js"></script>
 <style>
 :root{--ink:#08090b;--panel:#ffffff;--line:#e2e8f0;--cream:#1e293b;--gold:#d8b258;
  --hi:#f0cf72;--deep:#9a7230;--dim:#64748b;--warn:#ef4444; --bg:#f8fafc; --bg-alt:#f1f5f9; --btn-hover: #fffbeb; --btn-sel: #fef3c7; --border-sel: #fbbf24}
@@ -944,7 +947,16 @@ function submitLead() {
             {name:'symptoms',         value:symptoms},
             {name:'source',           value:A.src||''}
         ];
-        const payloadBody = JSON.stringify({fields, context:{pageUri:location.href, pageName:document.title}});
+        // Pull the HubSpot tracking cookie so the submission is trusted (not spam-filtered).
+        const hutk = (document.cookie.match(/(?:^|; )hubspotutk=([^;]+)/)||[])[1] || '';
+        const payloadBody = JSON.stringify({
+            fields,
+            context: {
+                hutk: hutk,
+                pageUri: location.href,
+                pageName: document.title
+            }
+        });
         fetch(`https://api.hsforms.com/submissions/v3/integration/submit/${HUBSPOT_PORTAL_ID}/${HUBSPOT_FORM_GUID}`, {
             method:'POST',
             headers:{'Content-Type':'application/json'},
