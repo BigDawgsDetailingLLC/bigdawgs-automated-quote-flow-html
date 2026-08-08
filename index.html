@@ -851,6 +851,23 @@ function scrContact(){
   return h;
 }
 
+// Debug toast — only appears when the URL has ?debug=1. Used to surface HubSpot
+// success/error visually on mobile where DevTools isn't available.
+function showDebugToast(message, kind){
+    if(!P.get('debug')) return;
+    let el = document.getElementById('debugToast');
+    if(!el){
+        el = document.createElement('div');
+        el.id = 'debugToast';
+        el.style.cssText = 'position:fixed;left:12px;right:12px;bottom:12px;padding:14px 16px;border-radius:10px;font-family:monospace;font-size:13px;line-height:1.35;z-index:9999;box-shadow:0 8px 20px rgba(0,0,0,.2);word-break:break-word;';
+        document.body.appendChild(el);
+    }
+    el.style.background = kind==='ok' ? '#dcfce7' : '#fee2e2';
+    el.style.color = kind==='ok' ? '#166534' : '#991b1b';
+    el.style.border = '1px solid '+(kind==='ok'?'#16a34a':'#dc2626');
+    el.textContent = message;
+}
+
 function initTracking(){
     // GA4
     if(GA4_MEASUREMENT_ID){
@@ -915,16 +932,39 @@ function submitLead() {
             {name:'symptoms',         value:symptoms},
             {name:'source',           value:A.src||''}
         ];
+        const payloadBody = JSON.stringify({fields, context:{pageUri:location.href, pageName:document.title}});
         fetch(`https://api.hsforms.com/submissions/v3/integration/submit/${HUBSPOT_PORTAL_ID}/${HUBSPOT_FORM_GUID}`, {
             method:'POST',
             headers:{'Content-Type':'application/json'},
-            body:JSON.stringify({
-                fields,
-                context:{pageUri:location.href, pageName:document.title}
-            })
-        }).catch(err => console.error('HubSpot submit failed:', err));
+            body:payloadBody
+        })
+        .then(async r => {
+            const bodyText = await r.text();
+            let bodyJson=null; try{bodyJson=JSON.parse(bodyText);}catch(e){}
+            if(r.ok) {
+                console.log('HubSpot submit OK:', r.status, bodyJson||bodyText);
+                showDebugToast('OK — HubSpot accepted the submission (HTTP '+r.status+')', 'ok');
+            } else {
+                console.error('HubSpot submit REJECTED:', r.status, bodyJson||bodyText);
+                console.error('Sent payload:', payloadBody);
+                let msg = 'HubSpot rejected (HTTP '+r.status+'): ';
+                if(bodyJson && bodyJson.errors && bodyJson.errors.length) {
+                    msg += bodyJson.errors.map(e=>e.message||e.errorType).join(' | ');
+                } else if(bodyJson && bodyJson.message) {
+                    msg += bodyJson.message;
+                } else {
+                    msg += (bodyText||'unknown').slice(0,300);
+                }
+                showDebugToast(msg, 'err');
+            }
+        })
+        .catch(err => {
+            console.error('HubSpot submit network error:', err);
+            showDebugToast('Network error hitting HubSpot: '+(err.message||err), 'err');
+        });
     } else {
         console.warn('HUBSPOT_FORM_GUID is not set — lead not posted. See setup block at top of script.');
+        showDebugToast('HUBSPOT_FORM_GUID is empty in the code — nothing was sent to HubSpot.', 'err');
     }
 
     // Fire GA4 + Meta Pixel conversion events (only fire if their IDs are configured)
