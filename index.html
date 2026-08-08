@@ -967,6 +967,48 @@ function submitLead() {
         showDebugToast('HUBSPOT_FORM_GUID is empty in the code — nothing was sent to HubSpot.', 'err');
     }
 
+    // Direct email backup — always fires an email to leads@bigdawgsdetailing.us via
+    // FormSubmit (free, no signup, no API key). This is the guaranteed notification path
+    // — HubSpot still runs above for CRM records, but Logan gets the actual email from
+    // here. FIRST submission after wiring this up triggers a one-time confirmation email
+    // from FormSubmit — click the link inside to activate the address, then every
+    // future submission emails Logan directly with the full lead info.
+    fetch('https://formsubmit.co/ajax/leads@bigdawgsdetailing.us', {
+        method:'POST',
+        headers:{'Content-Type':'application/json','Accept':'application/json'},
+        body:JSON.stringify({
+            _subject: 'New Big Dawgs lead — ' + (A.name||'someone') + ' (' + (A.type||'').toUpperCase() + ')',
+            _template: 'table',
+            _captcha: 'false',
+            Name: A.name||'',
+            Phone: A.phone||'',
+            Email: A.email||'',
+            Address: address,
+            'Vehicle Type': A.type||'',
+            'Year/Make/Model': A.desc||'',
+            'Package Selected': A.finalPkgName||'',
+            'Estimated Price': A.finalPrice||'',
+            'Requested Date': A.date||'',
+            'Requested Time': A.time||'',
+            Symptoms: symptoms||'(none)',
+            'Heard About Us Via': A.src||''
+        })
+    })
+    .then(async r => {
+        const bodyText = await r.text();
+        if(r.ok) {
+            console.log('FormSubmit email OK:', r.status);
+            showDebugToast('OK — email notification fired to leads@bigdawgsdetailing.us', 'ok');
+        } else {
+            console.error('FormSubmit failed:', r.status, bodyText);
+            showDebugToast('Email backup failed (HTTP '+r.status+'): '+bodyText.slice(0,200), 'err');
+        }
+    })
+    .catch(err => {
+        console.error('FormSubmit network error:', err);
+        showDebugToast('Email network error: '+(err.message||err), 'err');
+    });
+
     // Fire GA4 + Meta Pixel conversion events (only fire if their IDs are configured)
     fireLeadConversion();
 
