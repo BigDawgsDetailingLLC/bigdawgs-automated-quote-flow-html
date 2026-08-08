@@ -60,9 +60,10 @@ label.fl{font-family:'IBM Plex Mono';font-size:10px;letter-spacing:.6px;text-tra
 .inc li:last-child{border:0}
 .inc li:before{content:'';position:absolute;left:4px;top:16px;width:6px;height:6px;background:var(--gold);border-radius:50%}
 
-.missing-list { list-style:none; margin-top: 8px; margin-bottom: 16px; opacity: 0.8;}
-.missing-list li { font-size:14px; color:var(--dim); padding:6px 0 6px 24px; position:relative; text-decoration: line-through;}
-.missing-list li:before { content:'✕'; position:absolute; left:4px; top:6px; font-size: 10px; color: var(--warn); }
+.extras-list{list-style:none;margin-top:8px;margin-bottom:16px;}
+.extras-list li{font-size:14px;color:var(--ink);padding:8px 0 8px 26px;position:relative;border-bottom:1px solid var(--bg-alt);}
+.extras-list li:last-child{border:0;}
+.extras-list li:before{content:'✓';position:absolute;left:4px;top:8px;color:var(--gold);font-weight:800;font-size:14px;}
 
 .alt{border:1px solid var(--line);border-radius:12px;padding:24px 22px;margin-bottom:24px;background:var(--panel); box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.03);}
 .alt b{font-family:'IBM Plex Mono';font-size:10px;letter-spacing:.7px;text-transform:uppercase;color:var(--dim);display:block;margin-bottom:6px; font-weight: 500}
@@ -75,6 +76,36 @@ label.fl{font-family:'IBM Plex Mono';font-size:10px;letter-spacing:.6px;text-tra
 .btn-book:hover { background: var(--hi); transform: translateY(-2px); box-shadow: 0 6px 10px rgba(216, 178, 88, 0.4); }
 .btn-book.alt-book { background: var(--panel); border: 2px solid var(--gold); box-shadow: none; color: var(--ink); }
 .btn-book.alt-book:hover { background: var(--btn-hover); transform: translateY(-1px); }
+
+.maint{border:1px solid var(--line);border-radius:12px;padding:20px 22px;margin-bottom:24px;background:var(--panel);}
+.maint-toggle{display:flex;gap:12px;align-items:flex-start;cursor:pointer;font-size:15px;color:var(--ink);font-weight:600;line-height:1.4;}
+.maint-toggle input{margin-top:3px;width:18px;height:18px;accent-color:var(--gold);cursor:pointer;flex:none;}
+.maint-body{margin-top:6px;}
+.maint-body > p{font-size:14px;color:var(--cream);margin:10px 0 14px;}
+.maint-opt{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start;padding:14px;border:1px solid var(--line);border-radius:8px;margin-bottom:10px;cursor:pointer;transition:.15s ease;background:var(--bg-alt);}
+.maint-opt:hover{border-color:var(--gold);}
+.maint-opt.sel{border-color:var(--gold);background:var(--panel);box-shadow:0 2px 6px rgba(216,178,88,.15);}
+.maint-opt input{margin-top:3px;accent-color:var(--gold);cursor:pointer;}
+.maint-opt-body{display:block;min-width:0;}
+.maint-opt-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;}
+.maint-opt-top b{font-family:'Big Shoulders Display';font-size:20px;font-weight:800;color:var(--ink);line-height:1.1;}
+.maint-opt-price{font-family:'IBM Plex Mono';color:var(--gold);font-size:13px;font-weight:600;}
+.maint-opt-note{display:block;font-size:13px;color:var(--dim);margin-top:4px;}
+
+.slider-wrap{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:24px 22px;margin:14px 0;text-align:center;}
+.slider-val{font-family:'Big Shoulders Display';font-weight:800;font-size:64px;color:var(--gold);line-height:1;margin-bottom:16px;}
+.slider{width:100%;accent-color:var(--gold);cursor:pointer;height:6px;}
+.slider-marks{display:flex;justify-content:space-between;margin-top:10px;font-family:'IBM Plex Mono';font-size:11px;color:var(--dim);letter-spacing:.6px;text-transform:uppercase;}
+
+.line-items{border-top:1px solid var(--line);margin-top:16px;padding-top:12px;}
+.li-row{display:flex;justify-content:space-between;gap:12px;font-size:14px;color:var(--cream);padding:6px 0;}
+.li-row span:last-child{font-family:'IBM Plex Mono';color:var(--ink);white-space:nowrap;}
+.li-row.total{border-top:1px solid var(--line);margin-top:6px;padding-top:10px;font-family:'Big Shoulders Display';font-weight:800;font-size:18px;color:var(--ink);}
+.li-row.total span:last-child{color:var(--hi);font-family:'Big Shoulders Display';font-weight:800;font-size:20px;}
+
+.thanks-sub{color:var(--dim);font-size:12px;line-height:1.5;text-align:center;margin-top:14px;padding:0 8px;}
+.thanks-sub a{color:var(--gold);font-weight:600;text-decoration:none;}
+.thanks-sub a:hover{text-decoration:underline;}
 
 .out{border-radius:12px;padding:36px 24px;text-align:center;margin-bottom:14px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);}
 .out.book{background:var(--gold);color:var(--ink)}
@@ -135,6 +166,44 @@ label.fl{font-family:'IBM Plex Mono';font-size:10px;letter-spacing:.6px;text-tra
 
 <script>
 let A={},idx=0,fired=null;
+
+/* ============================================================================
+   HUBSPOT INTEGRATION
+   The Forms API is the safe, public-endpoint way to post leads from a static
+   HTML page — no auth token lives in the browser. To activate:
+
+   1. In HubSpot: Marketing → Forms → Create form → "Embedded form"
+      Name it "Big Dawgs Quote Flow" (or similar).
+      Add these fields (use existing contact properties, or create custom ones
+      as single-line text where noted):
+        - firstname                 (contact prop)
+        - lastname                  (contact prop)
+        - phone                     (contact prop)
+        - email                     (contact prop)
+        - address                   (contact prop; or custom single-line text)
+        - vehicle                   (custom single-line text)
+        - package_selected          (custom single-line text)
+        - estimated_price           (custom single-line text)
+        - requested_date            (custom single-line text)
+        - requested_time            (custom single-line text)
+        - symptoms                  (custom multi-line text)
+        - source                    (custom single-line text)
+      Publish.
+
+   2. Grab the form's GUID from the URL (looks like a UUID) and paste it into
+      HUBSPOT_FORM_GUID below.
+
+   3. To get the new-lead email to leads@bigdawgsdetailing.us:
+      Automation → Workflows → Create workflow → "From scratch, Contact-based"
+      Enrollment trigger: Form submission → the form you just made
+      Action: Send internal email notification → to leads@bigdawgsdetailing.us
+      Turn it on.
+
+   Portal ID (245895086) is Logan's HubSpot account ID. The Forms API endpoint
+   is public per-form and scoped to just creating submissions on that form ID.
+   ============================================================================ */
+const HUBSPOT_PORTAL_ID = '245895086';
+const HUBSPOT_FORM_GUID = 'd86a43ad-c65d-48ca-818a-9b025d43347d'; // Big Dawgs Quote Flow form
 const P=new URLSearchParams(location.search);
 if(P.get('type'))A.type=P.get('type');
 if(P.get('src'))A.src=P.get('src');
@@ -151,6 +220,26 @@ const AUTO_PKG={
  elite :{n:'Elite',              p:{car:379,truck:449,van:509},  inc:['Foam wash, clay bar, and iron decontamination','One-step machine polish on painted surfaces','6-month protective paint sealant','Hot water extraction on interior carpets/cloth','Leather cleaned and conditioned','Engine bay cleaned and dressed']}
 };
 
+const CERAMIC_START={auto:399, boat:599, rv:599};
+
+const MAINT_PLANS_BY_TYPE={
+ auto:[
+  {id:'biweekly', label:'Every 2 weeks',  price:120, note:'Highest freshness. Least buildup between visits.'},
+  {id:'monthly',  label:'Monthly',        price:150, note:'The sweet spot for daily drivers.'},
+  {id:'quarterly',label:'Every 3 months', price:170, note:'Reset it four times a year. More work per visit.'}
+ ],
+ boat:[
+  {id:'biweekly', label:'Every 2 weeks',  price:250, note:'Highest freshness. Least buildup between trips.'},
+  {id:'monthly',  label:'Monthly',        price:300, note:'The sweet spot for a boat that gets used.'},
+  {id:'quarterly',label:'Every 3 months', price:450, note:'Reset it four times a year. More work per visit.'}
+ ],
+ rv:[
+  {id:'biweekly', label:'Every 2 weeks',  price:250, note:'Highest freshness. Least buildup between trips.'},
+  {id:'monthly',  label:'Monthly',        price:300, note:'The sweet spot for a rig that gets used.'},
+  {id:'quarterly',label:'Every 3 months', price:450, note:'Reset it four times a year. More work per visit.'}
+ ]
+};
+
 const AUTO_SYMPTOMS=[
  {id:'pets',   q:'Pets ride in it',                 add:40, in:1},
  {id:'trash',  q:'Trash and clutter to clear out',  add:30, in:1},
@@ -158,24 +247,53 @@ const AUTO_SYMPTOMS=[
  {id:'trim',   q:'Black trim has faded to grey',    add:39, out:1},
  {id:'spots',  q:"Water spots that won't wipe off", add:59, out:1}
 ];
-const BOAT_BANDS=[{id:'u20',l:'Under 20 ft',ft:18},{id:'b25',l:'20 – 25 ft',ft:23},{id:'b30',l:'26 – 30 ft',ft:28},
- {id:'b36',l:'31 – 36 ft',ft:34},{id:'b45',l:'37 – 45 ft',ft:41},{id:'o45',l:'Over 45 ft',ft:48,hand:1}];
-const BOAT_TABLE={u20:{wash:[200,260],int:[260,300],L1:[600,700],L2:[700,850],L3:[850,1050]},
- b25:{wash:[220,300],int:[280,375],L1:[650,950],L2:[850,1200],L3:[1050,1450]},
- b30:{wash:[280,380],int:[350,460],L1:[850,1250],L2:[1100,1550],L3:[1400,1900]},
- b36:{wash:[340,460],int:[420,560],L1:[1050,1550],L2:[1350,1900],L3:[1700,2350]},
- b45:{wash:[400,580],int:[500,700],L1:[1300,1900],L2:[1650,2300],L3:[2100,2900]}};
-const BOAT_STYLES=[{id:'pontoon',l:'Pontoon or tritoon',w:[0,.65]},{id:'bow',l:'Bowrider or deck boat',w:[0,.65]},
- {id:'console',l:'Center console or fishing',w:[0,.65]},{id:'cuddy',l:'Cuddy cabin or walkaround',w:[.2,.85]},
- {id:'cruiser',l:'Express or cabin cruiser',w:[.35,1]},{id:'other',l:'Something else',w:[.15,.9]}];
-const BOAT_SYMPTOMS=[
- {id:'ring',   q:'Brown or black ring along the waterline', ft:[6,9]},
- {id:'deck',   q:'Deck floor is stained or greyed',         ft:[5,8]},
- {id:'rust',   q:'Rust specks on the rails or hardware',    ft:[4,6]},
- {id:'glass',  q:'Clear vinyl windows are hazy',            flat:[80,140]},
- {id:'canvas', q:'Bimini or canvas top is dirty',           flat:[95,175]},
- {id:'logs',   q:'Pontoon logs are stained or chalky',      ft:[10,14], onlyStyle:'pontoon'}
+/* Marine matrix: exterior level × interior level, priced independently.
+   Formula = (BOAT_EXT[e].r * type.e + BOAT_INT[i].r * type.i) * ft * access.mult
+   Rates are $/ft, derived from Logan's real quoted jobs. */
+const BOAT_EXT=[
+ {k:0,n:'Not needed',       d:'Outside is fine. Nothing gets touched.',r:[0,0]},
+ {k:1,n:'Wash & Protect',   d:'Gelcoat still shines and beads. Full wash, waterline scrub, spray sealant.',r:[8,11]},
+ {k:2,n:'Cleaner Wax',      d:'Shines but stopped beading, or very light chalk. One machine pass with a cleaner wax.',r:[18,23]},
+ {k:3,n:'Polish & Seal',    d:'Dull and hazy on the sun sides. Machine polish, then sealed. Gloss comes back.',r:[29,35]},
+ {k:4,n:'Cut, Polish, Seal',d:'Chalk comes off on your hand. Compound, polish, seal. Full oxidation reset.',r:[43,53]}
 ];
+const BOAT_INT=[
+ {k:0,n:'Not needed',   d:'Inside is fine or you handle it. Left alone, left off the bill.',r:[0,0]},
+ {k:1,n:'Wipe Down',    d:'Kept covered, light use. Vinyl and surfaces wiped, floor blown and vacuumed.',r:[6,8]},
+ {k:2,n:'Full Interior',d:'A season of use. Every surface, vinyl cleaned and UV dressed, flooring, cupholders.',r:[12,15]},
+ {k:3,n:'Deep Clean',   d:'Mildew spots and set-in stains. Hand scrubbing on the vinyl, extraction on carpet.',r:[20,26]},
+ {k:4,n:'Full Restore', d:'Everything opens. Cubbies, lockers, under-seat, head and galley if it has them. Vinyl sealed.',r:[30,38]}
+];
+const BOAT_TYPES=[
+ {id:'pontoon',l:'Pontoon or tritoon',        e:.85, i:1.15},
+ {id:'bow',    l:'Bowrider or deck boat',     e:1,   i:1},
+ {id:'console',l:'Center console or fishing', e:1,   i:.85},
+ {id:'wake',   l:'Wake or surf boat',         e:1,   i:1.12},
+ {id:'cuddy',  l:'Cuddy or walkaround',       e:1.05,i:1.22},
+ {id:'cruiser',l:'Express or cabin cruiser',  e:1.05,i:1.45},
+ {id:'alum',   l:'Aluminum fishing boat',     e:.7,  i:.75}
+];
+const BOAT_ACCESS=[
+ {id:'trailer',l:'On a trailer at my place',     mult:1},
+ {id:'lift',   l:'On a lift',                    mult:1.08},
+ {id:'slip',   l:'In the water at a slip',      mult:1.10}
+];
+/* Add-ons render in the symptom-picker AND on the rec as itemized lines below the base package.
+   Each is priced by ft, flat, or 'per panel' (charged as a flat range for form simplicity). */
+const BOAT_ADDONS=[
+ {id:'bimini',    q:'Bimini top cleaned, both sides',         flat:[95,175]},
+ {id:'cover',     q:'Full boat cover cleaned',                flat:[85,150]},
+ {id:'panels',    q:'Clear vinyl enclosure panels',           flat:[100,160]},
+ {id:'aft',       q:'Aft deck / swim platform',               flat:[75,150]},
+ {id:'chrome',    q:'Interior chrome and stainless polished', ft:[6,9]},
+ {id:'scum',      q:'Heavy waterline / scum line',            ft:[6,9]},
+ {id:'logsAcid',  q:'Pontoon logs acid brightened',           ft:[14,18], onlyStyle:'pontoon'},
+ {id:'logsMir',   q:'Pontoon logs polished to mirror',        ft:[48,72], onlyStyle:'pontoon'},
+ {id:'trailerWash',q:'Trailer washed and dressed',            flat:[85,150]},
+ {id:'engine',    q:'Engine / outdrive cleaned and dressed',  flat:[65,120]},
+ {id:'ceramicInt',q:'Interior vinyl + gelcoat ceramic sealed',ft:[10,14]}
+];
+const BOAT_MINIMUM=350;
 
 const RV_BANDS=[{id:'u25',l:'Under 25 ft',ft:22},{id:'r32',l:'26 – 32 ft',ft:29},{id:'r38',l:'33 – 38 ft',ft:36},
  {id:'r45',l:'39 – 45 ft',ft:42},{id:'ro45',l:'Over 45 ft',ft:48,hand:1}];
@@ -193,9 +311,9 @@ const MARINAS=['Highport','Grandpappy Point','Catfish Bay','Alberta Creek','Bunc
 const r5=n=>Math.round(n/5)*5, money=n=>'$'+n.toLocaleString();
 const span=r=>r[0]===r[1]?money(r[0]):money(r[0])+' – '+money(r[1]);
 const list=a=>a.length===1?a[0]:a.length===2?a[0]+' and '+a[1]:a.slice(0,-1).join(', ')+', and '+a.slice(-1);
-const feet=()=>{const t=A.type==='boat'?BOAT_BANDS:RV_BANDS;const b=t.find(x=>x.id===A.band);return b?b.ft:0;};
-const bandObj=()=>(A.type==='boat'?BOAT_BANDS:RV_BANDS).find(x=>x.id===A.band);
-const sym=()=>A.type==='auto'?AUTO_SYMPTOMS:A.type==='boat'?BOAT_SYMPTOMS.filter(c=>!c.onlyStyle||A.style===c.onlyStyle):RV_SYMPTOMS;
+const feet=()=>{if(A.type==='boat')return +A.ft||24;const b=RV_BANDS.find(x=>x.id===A.band);return b?b.ft:0;};
+const bandObj=()=>A.type==='boat'?{ft:+A.ft||24,hand:(+A.ft||24)>45}:RV_BANDS.find(x=>x.id===A.band);
+const sym=()=>A.type==='auto'?AUTO_SYMPTOMS:A.type==='boat'?BOAT_ADDONS.filter(c=>!c.onlyStyle||A.style===c.onlyStyle):RV_SYMPTOMS;
 const chosen=()=>sym().filter(c=>A['s_'+c.id]);
 function weight(rng,w){const sp=rng[1]-rng[0];return[r5(rng[0]+sp*w[0]),r5(rng[0]+sp*w[1])];}
 
@@ -234,9 +352,16 @@ function recommend(){
     if(heavy.length) why.push('You flagged '+list(heavy)+'. That is extra hours on the same job, and it is already in the number — not a surprise at the truck.');
 
     const LADDER={exp:'decon',decon:'extrest',int:'intdeep',std:'sig',sig:'elite'};
-    const altMap={std:{k:'sig',t:'Step up'},sig:{k:'elite',t:'Step up'},elite:{k:'sig',t:'Lighter option'},
-                  int:{k:'intdeep',t:'Step up'},intdeep:{k:'int',t:'Lighter option'},
-                  exp:{k:'decon',t:'Step up'},decon:{k:'extrest',t:'Step up'},extrest:{k:'decon',t:'Lighter option'}};
+    const altMap={std:{k:'sig'},sig:{k:'elite'},
+                  int:{k:'intdeep'},
+                  exp:{k:'decon'},decon:{k:'extrest'}};
+    const UPGRADE_EXTRAS={
+      std:['Clay bar and iron decontamination','6-month protective paint sealant','Interior deep clean and dressing application'],
+      sig:['One-step machine polish on painted surfaces','Hot water extraction on interior carpets/cloth','Leather cleaned and conditioned','Engine bay cleaned and dressed'],
+      int:['Hot water extraction on carpet and cloth seats','Leather cleaned and conditioned','Professional odor treatment'],
+      exp:['Clay bar decontamination treatment','Iron and tar chemical removal','6-month protective paint sealant'],
+      decon:['One-step machine polish on all painted surfaces','Swirls and light scratches knocked down']
+    };
     let total=base+surcharge, crossover=null;
     const up=LADDER[key];
     if(up&&total+60>=AUTO_PKG[up].p[cls]&&AUTO_PKG[up].p[cls]>total){
@@ -245,54 +370,77 @@ function recommend(){
     }
     const alt=altMap[key];
     return {key,name:pkg.n,inc:pkg.inc,exact:true,price:[total,total],base,surcharge,why,crossover,
-      alt:alt?{k:alt.k, t:alt.t, n:AUTO_PKG[alt.k].n, p:money(AUTO_PKG[alt.k].p[cls]), inc:AUTO_PKG[alt.k].inc}:null,
+      alt:alt?{k:alt.k, n:AUTO_PKG[alt.k].n, p:money(AUTO_PKG[alt.k].p[cls]), extras:UPGRADE_EXTRAS[key]||[]}:null,
       ceramic:(key==='elite'||key==='sig'||key==='extrest')&&E<4,
+      ceramicUpsell:(key==='elite'||key==='intdeep'||key==='extrest'),
       correction:E===4, spread:0};
   }
 
   if(A.type==='boat'){
-    const b=bandObj(); if(b&&b.hand) return {hand:'Over 45 feet is priced by hand every time. Too much variation to put a number on it from a form.'};
-    const row=BOAT_TABLE[A.band], st=BOAT_STYLES.find(x=>x.id===A.style), w=st?st.w:[.15,.9];
-    const H=+A.hull, N=+A.bint;               
-    if(!H&&!N) return {nothing:true};
-    let key,name,why=[],r=[0,0];
+    const ft=feet(); if(ft>45) return {hand:'Over 45 feet is priced by hand every time. Too much variation to put a number on it from a form.'};
+    const t = BOAT_TYPES.find(x=>x.id===A.style) || BOAT_TYPES[1];
+    const ac= BOAT_ACCESS.find(x=>x.id===A.lives) || BOAT_ACCESS[0];
+    const e = +A.hull|0;   // 0-4 exterior level
+    const i = +A.bint|0;   // 0-4 interior level
+    if(!e && !i) return {nothing:true};
 
-    if(H){
-      const lvl = H===1?0 : H===2?1 : H===3?2 : 3;
-      key = lvl===0?'wash':'L'+lvl;
-      name = lvl===0?'Wash and Protect':'Exterior Revival — Level '+lvl;
-      r=weight(row[key],w);
-    }
-    if(N){
-      let ir=weight(row.int,w);
-      if(N===1) ir=[r5(ir[0]*.7),r5(ir[1]*.8)];
-      if(N===3) ir=[r5(ir[0]*1.15),r5(ir[1]*1.3)];
-      r=[r[0]+ir[0],r[1]+ir[1]];
-      if(!H){key='int';name='Interior Detail';}
-      else name+=' + Interior';
-    }
-    chosen().forEach(c=>{ if(c.ft)r=[r[0]+r5(c.ft[0]*feet()),r[1]+r5(c.ft[1]*feet())];
-                          else if(c.flat)r=[r[0]+c.flat[0],r[1]+c.flat[1]]; });
+    const baseLo = (BOAT_EXT[e].r[0]*t.e + BOAT_INT[i].r[0]*t.i) * ft * ac.mult;
+    const baseHi = (BOAT_EXT[e].r[1]*t.e + BOAT_INT[i].r[1]*t.i) * ft * ac.mult;
 
-    const HW={1:'The gelcoat still has its gloss and water still beads. Clean and protect, not correction. You should not be paying correction prices for this.',
-              2:'It shines but the water stopped beading, so the protection is spent. A cleaner wax puts it back before the sun takes the gloss.',
-              3:'Dull on the sun-facing sides but not chalked yet is a machine polish. This is the window where it still comes back easy.',
-              4:'Chalk on your hand means the gelcoat is oxidized through. Compound, polish, then seal. There is no shortcut and a wash will not touch it.'};
-    const NW={1:'Inside just needs wiped down. That is a light touch and it is priced like one.',
-              2:'A season of use is the normal job. Every surface, the vinyl, the flooring, the lockers.',
-              3:'Mildew and set-in stains in the vinyl are the slow part. It comes out, but it is hand work, and that is where the hours go.'};
-    if(H) why.push(HW[H]); else why.push('You said the outside is fine. Not touching it, not charging for it.');
-    if(N) why.push(NW[N]); else why.push('You said the inside is fine, so this is exterior only.');
+    // Itemized add-ons — kept as a separate list for the receipt-style render, NOT folded into totals silently
+    const picked = chosen();  // sym() filters BOAT_ADDONS by boat style
+    const items = picked.map(c => {
+      if(c.ft)   return {n:c.q, lo:r5(c.ft[0]*ft),   hi:r5(c.ft[1]*ft)};
+      if(c.flat) return {n:c.q, lo:c.flat[0],        hi:c.flat[1]};
+      return {n:c.q, lo:0, hi:0};
+    });
+    const addLo = items.reduce((s,x)=>s+x.lo,0);
+    const addHi = items.reduce((s,x)=>s+x.hi,0);
+    let lo = Math.max(BOAT_MINIMUM, r5(baseLo)+addLo);
+    let hi = Math.max(BOAT_MINIMUM, r5(baseHi)+addHi);
+
+    const name = (e ? BOAT_EXT[e].n : '') + (e && i ? ' + ' : '') + (i ? BOAT_INT[i].n : '');
+    const why = [];
+    if(e) why.push(BOAT_EXT[e].d); else why.push('You said the outside is fine. Not touching it, not charging for it.');
+    if(i) why.push(BOAT_INT[i].d); else why.push('You said the inside is fine, so this is exterior only.');
     if(A.lives==='slip') why.push('Working it in the slip means everything happens off the dock. Slower than a trailer, and it is priced in — no day-of surprise.');
-    const flagged=chosen().map(c=>c.q.toLowerCase());
-    if(flagged.length) why.push('You flagged '+list(flagged)+'.');
 
-    return {key,name,inc:boatInc(key,N?'both':'out'),exact:false,price:[r5(r[0]),r5(r[1])],why,
-      ceramic:(key==='L2'||key==='L3'), spread:Math.round((r[1]/r[0]-1)*100),
-      whyRange: key==='L3'?'Some hulls come back in two passes. Some take four. That is the whole spread.':
-                key==='L2'?'Where it lands depends on how the gelcoat responds to the first pass.':
-                key==='int'?'Depends what is set into the vinyl versus sitting on top of it.':
-                            'Predictable work. The spread just covers how much is actually on it.'};
+    const inc = [];
+    if(e) inc.push(BOAT_EXT[e].n+' — exterior treatment at $'+BOAT_EXT[e].r[0]+'–$'+BOAT_EXT[e].r[1]+'/ft');
+    if(i) inc.push(BOAT_INT[i].n+' — interior treatment at $'+BOAT_INT[i].r[0]+'–$'+BOAT_INT[i].r[1]+'/ft');
+
+    // Upgrade card: bump exterior first (bigger dollar delta), then interior; null = top of ladder → ceramic
+    let alt=null;
+    if(e && e<4){
+      const eu=e+1;
+      const uLo=r5((BOAT_EXT[eu].r[0]*t.e + BOAT_INT[i].r[0]*t.i)*ft*ac.mult)+addLo;
+      const uHi=r5((BOAT_EXT[eu].r[1]*t.e + BOAT_INT[i].r[1]*t.i)*ft*ac.mult)+addHi;
+      alt={k:'e'+eu, n:BOAT_EXT[eu].n+(i?' + '+BOAT_INT[i].n:''), p:span([Math.max(BOAT_MINIMUM,uLo),Math.max(BOAT_MINIMUM,uHi)]),
+           extras:[BOAT_EXT[eu].n+' — '+BOAT_EXT[eu].d]};
+    } else if(i && i<4){
+      const iu=i+1;
+      const uLo=r5((BOAT_EXT[e].r[0]*t.e + BOAT_INT[iu].r[0]*t.i)*ft*ac.mult)+addLo;
+      const uHi=r5((BOAT_EXT[e].r[1]*t.e + BOAT_INT[iu].r[1]*t.i)*ft*ac.mult)+addHi;
+      alt={k:'i'+iu, n:(e?BOAT_EXT[e].n+' + ':'')+BOAT_INT[iu].n, p:span([Math.max(BOAT_MINIMUM,uLo),Math.max(BOAT_MINIMUM,uHi)]),
+           extras:[BOAT_INT[iu].n+' — '+BOAT_INT[iu].d]};
+    }
+
+    const topOfLadder = (e===4 && (i===0||i===4)) || (e===0 && i===4);
+
+    return {
+      key:'boatE'+e+'I'+i, name, inc, why,
+      exact:false, price:[lo,hi],
+      items, baseLo:r5(baseLo), baseHi:r5(baseHi),
+      alt,
+      ceramic: e===4,
+      ceramicUpsell: topOfLadder,
+      ft,
+      spread: baseHi>0 ? Math.round((baseHi/baseLo-1)*100) : 0,
+      whyRange: e===4 ? 'Some hulls come back in two passes. Some take four. That is the whole spread.'
+              : e===3 ? 'Where it lands depends on how the gelcoat responds to the first pass.'
+              : i>=3  ? 'Depends what is set into the vinyl versus sitting on top of it.'
+              :         'Predictable work. The spread just covers how much is actually on it.'
+    };
   }
 
   if(A.type==='rv'){
@@ -315,8 +463,25 @@ function recommend(){
     else                   why.push('Roof was done recently, so it is left off and left off your bill.');
     const flagged=chosen().map(c=>c.q.toLowerCase());
     if(flagged.length) why.push('You flagged '+list(flagged)+'.');
+    const RV_ALT={seal:'full', full:'ox'};
+    const RV_EXTRAS={
+      seal:['Full decontamination pass before polish','Machine polish on the sidewalls to bring back gloss','Wheels and wells cleaned'],
+      full:['Full compound + polish + seal, not single-pass','Oxidation cut off the clear coat']
+    };
+    const rAltKey=RV_ALT[key];
+    let rAlt=null;
+    if(rAltKey){
+      const rAltRng=[...row[rAltKey]];
+      if(roof){const p=feet()>30?225:175; rAltRng[0]+=p; rAltRng[1]+=p;}
+      chosen().forEach(c=>{ if(c.ft){rAltRng[0]+=r5(c.ft[0]*feet());rAltRng[1]+=r5(c.ft[1]*feet());}
+                            else if(c.flat){rAltRng[0]+=c.flat[0];rAltRng[1]+=c.flat[1];}});
+      const rAltName={seal:'Wash and Seal', full:'Full Exterior Detail', ox:'Oxidation Removal'}[rAltKey];
+      rAlt={k:rAltKey, n:rAltName, p:span([r5(rAltRng[0]),r5(rAltRng[1])]), extras:RV_EXTRAS[key]||[]};
+    }
     return {key,name,inc:rvInc(key,roof),exact:false,price:[r5(r[0]),r5(r[1])],why,
+      alt:rAlt,
       ceramic:(key==='full'||key==='ox'),
+      ceramicUpsell:(key==='ox'),
       spread:Math.round((r[1]/r[0]-1)*100),
       whyRange: key==='ox'?'Some sidewalls come back in two passes. Some take four.':
                 key==='full'?'Depends how much gloss is left to bring back.':
@@ -392,11 +557,9 @@ a_int:{h:'How does the inside look?',sub:'Same thing. Honest answer gets you the
   {v:'4',l:'Something spilled and set in',s:'Stains, or it smells'},
   {v:'0',l:'Nothing wrong with it',s:'Leave the inside alone'}]},
 
-b_len:{h:'How long is it?',k:'band',o:BOAT_BANDS.map(b=>({v:b.id,l:b.l}))},
-b_style:{h:'What kind of boat?',k:'style',o:BOAT_STYLES.map(b=>({v:b.id,l:b.l}))},
-b_lives:{h:'Where does it live?',k:'lives',o:[
-  {v:'trailer',l:'On a trailer at my place'},{v:'slip',l:'In the water at a slip'},
-  {v:'lift',l:'On a lift'},{v:'storage',l:'Covered or dry storage'}]},
+b_len:{h:'How long is it?',sub:'Slide to the closest foot. Over 45 ft is priced by hand — call for anything bigger.',k:'ft',slider:true},
+b_style:{h:'What kind of boat?',k:'style',o:BOAT_TYPES.map(b=>({v:b.id,l:b.l}))},
+b_lives:{h:'Where does it live?',k:'lives',o:BOAT_ACCESS.map(a=>({v:a.id,l:a.l}))},
 b_hull:{h:'Walk up to it dry. How does the hull look?',
  sub:'This is the answer that moves the price the most, so take a second on it.',k:'hull',o:[
   {v:'1',l:'It shines. It is just dirty.',s:'Water still beads when it rains'},
@@ -408,6 +571,7 @@ b_int:{h:'How does the inside look?',k:'bint',o:[
   {v:'1',l:'Just needs wiped down',s:'Kept covered, used lightly'},
   {v:'2',l:'Been out on it all season',s:'Dirty, sunscreen, lake water, drinks'},
   {v:'3',l:'Mildew spots or stains in the vinyl',s:'Set in, not wiping off'},
+  {v:'4',l:'Everything opens — restore level',s:'Cubbies, lockers, head, galley, vinyl sealed'},
   {v:'0',l:'Nothing wrong with it',s:'Leave the inside alone'}]},
 
 r_len:{h:'How long is it?',k:'band',o:RV_BANDS.map(b=>({v:b.id,l:b.l}))},
@@ -446,8 +610,18 @@ function render(){
   else{
     const c=T[id];
     h+=`<h1>${c.h}</h1>`+(c.sub?`<div class="sub">${c.sub}</div>`:'');
-    c.o.forEach(o=>{h+=`<button class="opt${A[c.k]===o.v?' sel':''}" onclick="pick('${c.k}','${o.v}')">
-      ${o.l}${o.s?`<small>${o.s}</small>`:''}</button>`;});
+    if(c.slider){
+      if(A[c.k]==null) A[c.k]=24;
+      const v=+A[c.k];
+      h+=`<div class="slider-wrap">
+            <div class="slider-val">${v} ft</div>
+            <input type="range" min="16" max="46" value="${v}" oninput="setFt(this.value)" class="slider">
+            <div class="slider-marks"><span>16 ft</span><span>30 ft</span><span>45+ ft</span></div>
+          </div>`;
+    } else {
+      c.o.forEach(o=>{h+=`<button class="opt${A[c.k]===o.v?' sel':''}" onclick="pick('${c.k}','${o.v}')">
+        ${o.l}${o.s?`<small>${o.s}</small>`:''}</button>`;});
+    }
   }
   h+='</div>';
   document.getElementById('screen').innerHTML=h;
@@ -459,7 +633,7 @@ function render(){
   
   // Only show the bottom navigation on screens that require multi-selection or typing.
   // Single-choice questions (and the rec/outcome screens) hide the nav bar for auto-advance.
-  if(id === 'symptoms' || id === 'contact') {
+  if(id === 'symptoms' || id === 'contact' || (T[id] && T[id].slider)) {
       nav.style.display = 'block';
   } else {
       nav.style.display = 'none';
@@ -484,7 +658,19 @@ function scrSymptoms(){
 function pickPkg(pkgName, pkgPrice) {
     A.finalPkgName = pkgName;
     A.finalPrice = pkgPrice;
+    A.maintDiscount = (A.maint && A.maintPlan) ? 0.10 : 0;
     next();
+}
+
+function toggleMaint(on) {
+    A.maint = on;
+    if(!on) A.maintPlan = null;
+    render();
+}
+
+function pickMaint(id) {
+    A.maintPlan = id;
+    render();
 }
 
 function scrRec(){
@@ -509,7 +695,19 @@ function scrRec(){
   h+=`<ul class="inc">`+R.inc.map(i=>`<li>${i}</li>`).join('')+`</ul>`;
   if(R.surcharge>0) h+=`<p style="margin-top:14px;color:var(--dim);font-size:14px">
     ${AUTO_PKG[R.key].n} is ${money(R.base)}. The condition work you flagged is the other ${money(R.surcharge)}.</p>`;
-    
+
+  // Boat: receipt-style breakdown when add-ons are stacked on top of the base package
+  if(A.type==='boat' && R.items && R.items.length) {
+    h+=`<div class="line-items">
+          <div class="li-row"><span>${R.name||'Base package'}</span><span>${span([R.baseLo,R.baseHi])}</span></div>`;
+    R.items.forEach(x => {
+      const p = x.hi===x.lo ? money(x.lo) : money(x.lo)+' – '+money(x.hi);
+      h+=`<div class="li-row"><span>+ ${x.n}</span><span>+${p}</span></div>`;
+    });
+    h+=`  <div class="li-row total"><span>Total</span><span>${span(R.price)}</span></div>
+        </div>`;
+  }
+
   // Main Book Button
   h+=`<button class="btn-book" style="margin-top:20px;" onclick="pickPkg('${R.name}', '${span(R.price)}')">Book ${R.name} Now</button>`;
   h+=`</div></div>`;
@@ -518,34 +716,74 @@ function scrRec(){
     Scratches and swirls are the only thing I will not price off a form. How much comes out depends on how thick the clear coat is,
     and I cannot see that from here. I will look at it in person and tell you straight what will and will not come out.</div>`;
     
-  // Lower Tier / Alternative package rendering with its own Book Button
+  // Second card: upgrade path (mid-ladder) OR ceramic upsell (top of ladder). Never both.
   if(R.alt) {
       h+=`<div class="alt">
-            <b>${R.alt.t}</b>
+            <b>Level Up</b>
             <div class="alt-name">${R.alt.n}</div>
             <span class="r">${R.alt.p}</span>
-            <p style="color:var(--cream);font-size:14px;margin-bottom:8px">If you want to save some money, we can step down to this package.</p>
-            <p style="color:var(--ink);font-weight:600;font-size:14px;margin-top:16px;">This Includes:</p>
+            <p style="color:var(--cream);font-size:14px;margin-bottom:12px">
+              Want the full experience? Step up to ${R.alt.n} and get everything above, plus more.
+            </p>
+            <p style="color:var(--ink);font-weight:600;font-size:14px;margin-top:16px;">Everything in ${R.name}:</p>
             <ul class="inc" style="margin-top:6px; margin-bottom:12px;">`;
-      
-      R.alt.inc.forEach(i => { h+= `<li>${i}</li>`; });
+      R.inc.forEach(i => { h+= `<li>${i}</li>`; });
       h+=`</ul>`;
-      
-      // Calculate what they miss out on by comparing arrays
-      if(R.inc && R.inc.length > 0) {
-          const missing = R.inc.filter(item => !R.alt.inc.includes(item));
-          if(missing.length > 0) {
-              h+= `<p style="color:var(--warn);font-weight:600;font-size:14px;">What you'll miss out on:</p>
-                   <ul class="missing-list">`;
-              missing.forEach(i => { h+= `<li>${i}</li>`; });
-              h+= `</ul>`;
-          }
+
+      if(R.alt.extras && R.alt.extras.length > 0) {
+          h+= `<p style="color:var(--gold);font-weight:600;font-size:14px;margin-top:14px;">You also get:</p>
+               <ul class="extras-list">`;
+          R.alt.extras.forEach(i => { h+= `<li>${i}</li>`; });
+          h+= `</ul>`;
       }
 
-      h+=`<button class="btn-book alt-book" onclick="pickPkg('${R.alt.n}', '${R.alt.p}')">Book ${R.alt.n} Instead</button>
+      h+=`<button class="btn-book alt-book" onclick="pickPkg('${R.alt.n}', '${R.alt.p}')">Upgrade to ${R.alt.n}</button>
+          </div>`;
+  } else if(R.ceramicUpsell) {
+      const priceLabel = A.type==='boat'
+        ? ('Starting at '+span([r5(45*R.ft), r5(65*R.ft)]))
+        : ('Starting at '+money(CERAMIC_START[A.type]));
+      const pitch = A.type==='boat'
+        ? 'You are already putting it in the top package — protect the gelcoat. Ceramic keeps it slick, beading, and easier to wash for seasons, not weeks. Final number depends on the gelcoat, I quote it in person.'
+        : 'You are already putting it in the top package — protect the work. Ceramic keeps the paint slick, beading, and easier to wash for years, not weeks. Final number depends on the paint, I quote it in person.';
+      h+=`<div class="alt">
+            <b>Lock It In</b>
+            <div class="alt-name">Ceramic Coating</div>
+            <span class="r">${priceLabel}</span>
+            <p style="color:var(--cream);font-size:14px;margin-bottom:12px">
+              ${pitch}
+            </p>
+            <ul class="extras-list">
+              <li>Long-term paint protection, not a two-week sealant</li>
+              <li>Water and dirt slide off — washes take half the time</li>
+              <li>UV and chemical resistance so the color holds</li>
+            </ul>
+            <button class="btn-book alt-book" onclick="pickPkg('${R.name} + Ceramic Coating', 'Quoted in person')">Add Ceramic Coating</button>
           </div>`;
   }
-  
+
+  // Maintenance plan checkbox — every rec, all vehicle types
+  h+=`<div class="maint">
+        <label class="maint-toggle">
+          <input type="checkbox" ${A.maint?'checked':''} onchange="toggleMaint(this.checked)">
+          <span>Want me to keep it this clean? Save 10% today when you set up a maintenance plan.</span>
+        </label>`;
+  if(A.maint) {
+      h+=`<div class="maint-body">
+            <p>Pick how often. Less often = more built-up dirt on the truck, so the per-visit price steps up.</p>`;
+      (MAINT_PLANS_BY_TYPE[A.type]||MAINT_PLANS_BY_TYPE.auto).forEach(p => {
+          h+=`<label class="maint-opt ${A.maintPlan===p.id?'sel':''}">
+                <input type="radio" name="maintPlan" value="${p.id}" ${A.maintPlan===p.id?'checked':''} onchange="pickMaint('${p.id}')">
+                <span class="maint-opt-body">
+                  <span class="maint-opt-top"><b>${p.label}</b><span class="maint-opt-price">Starting at ${money(p.price)}/visit</span></span>
+                  <span class="maint-opt-note">${p.note}</span>
+                </span>
+              </label>`;
+      });
+      h+=`</div>`;
+  }
+  h+=`</div>`;
+
   return h;
 }
 
@@ -587,86 +825,55 @@ function scrContact(){
 }
 
 function submitLead() {
-    // -----------------------------------------------------------------------------
-    // API INTEGRATION BLANKS
-    // -----------------------------------------------------------------------------
-    
-    const payload = {
-        customer: {
-            name: A.name,
-            phone: A.phone,
-            email: A.email,
-            address: A.addr || A.marina + " " + (A.slip || "")
-        },
-        vehicle: A.desc,
-        packageSelected: A.finalPkgName,
-        estimatedPrice: A.finalPrice,
-        requestedDate: A.date,
-        requestedTime: A.time,
-        source: A.src,
-        symptoms: chosen().map(c=>c.q).join(', ')
-    };
+    const nameParts = (A.name||'').trim().split(/\s+/);
+    const firstname = nameParts[0] || '';
+    const lastname  = nameParts.slice(1).join(' ');
+    const address   = A.addr || [A.marina, A.slip].filter(Boolean).join(' ');
+    const symptoms  = chosen().map(c=>c.q).join(', ');
 
-    console.log("Preparing to send lead data:", payload);
-
-    /* 
-    // TODO: ZAPIER / MAKE WEBHOOK
-    // Link this to a Catch Hook in Zapier to route to any apps you want.
-    fetch('YOUR_ZAPIER_WEBHOOK_URL_HERE', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-    }).catch(err => console.error("Webhook Error:", err));
-    */
-
-    /*
-    // TODO: HUBSPOT API
-    // Create a new Contact / Deal directly via HubSpot
-    fetch('https://api.hubapi.com/crm/v3/objects/contacts', {
-        method: 'POST',
-        headers: { 'Authorization': 'Bearer YOUR_HUBSPOT_ACCESS_TOKEN', 'Content-Type': 'application/json' },
-        body: JSON.stringify({ properties: { email: A.email, firstname: A.name, phone: A.phone } })
-    });
-    */
-
-    /*
-    // TODO: SETMORE API
-    // Create a customer / hold a slot
-    // Requires getting a token first from https://developer.setmore.com/
-    */
-
-    /*
-    // TODO: NOTIFICATION EMAIL (e.g., via SendGrid or Postmark)
-    // Send email to Heath.Turner@bigdawgsdetailing.us
-    fetch('https://api.sendgrid.com/v3/mail/send', {
-        method: 'POST',
-        headers: { 'Authorization': 'Bearer YOUR_SENDGRID_API_KEY', 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            personalizations: [{ to: [{ email: "Heath.Turner@bigdawgsdetailing.us" }] }],
-            from: { email: "no-reply@bigdawgsdetailing.us" },
-            subject: "New Booking Request: " + A.finalPkgName,
-            content: [{ type: "text/plain", value: JSON.stringify(payload, null, 2) }]
-        })
-    });
-    */
-
-    /*
-    // TODO: GOOGLE TAG MANAGER / FACEBOOK PIXEL EVENT
-    if(typeof gtag === 'function') {
-        gtag('event', 'generate_lead', {
-            currency: 'USD',
-            value: payload.estimatedPrice.replace(/[^0-9.-]+/g,"") // strips dollar sign
-        });
+    // Post to HubSpot Forms API — public endpoint, no secret token needed.
+    // Skips silently if the form GUID isn't set yet (see setup block near the top of this script).
+    if(HUBSPOT_FORM_GUID) {
+        const fields = [
+            {name:'firstname',        value:firstname},
+            {name:'lastname',         value:lastname},
+            {name:'phone',            value:A.phone||''},
+            {name:'email',            value:A.email||''},
+            {name:'address',          value:address},
+            {name:'vehicle',          value:A.desc||''},
+            {name:'package_selected', value:A.finalPkgName||''},
+            {name:'estimated_price',  value:String(A.finalPrice||'')},
+            {name:'requested_date',   value:A.date||''},
+            {name:'requested_time',   value:A.time||''},
+            {name:'symptoms',         value:symptoms},
+            {name:'source',           value:A.src||''}
+        ];
+        fetch(`https://api.hsforms.com/submissions/v3/integration/submit/${HUBSPOT_PORTAL_ID}/${HUBSPOT_FORM_GUID}`, {
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({
+                fields,
+                context:{pageUri:location.href, pageName:document.title}
+            })
+        }).catch(err => console.error('HubSpot submit failed:', err));
+    } else {
+        console.warn('HUBSPOT_FORM_GUID is not set — lead not posted. See setup block at top of script.');
     }
-    */
-    
-    // Advance to final visual screen
+
+    // Advance to final visual screen (fires even if HubSpot call fails, so the customer
+    // still sees confirmation — network hiccups shouldn't break the booking flow).
     idx++;
     render();
 }
 
 function scrOutcome(){
   // Final Success Screen presented to the customer.
+  if(A.type==='boat' || A.type==='rv'){
+    return `<div class="out book">
+      <h2>THANK YOU FOR CHOOSING BIG DAWGS!</h2>
+      </div>
+      <div class="thanks-sub">A member of our team will reach out within 24 hrs to confirm! For questions or same-day bookings call <a href="tel:+15809165189">580-916-5189</a>.</div>`;
+  }
   return `<div class="out book">
     <h2>YOU'RE ON THE BOOK</h2>
     <p>We have received your request for the <b>${A.finalPkgName}</b> package.</p>
@@ -714,6 +921,7 @@ function pick(k,v){
 }
 
 function tog(id){A['s_'+id]=!A['s_'+id];render();}
+function setFt(v){A.ft=+v;const el=document.querySelector('.slider-val');if(el)el.textContent=v+' ft';paint();}
 function paint(){document.getElementById('next').disabled=!canAdvance(buildSteps()[idx]);}
 
 function next(){
