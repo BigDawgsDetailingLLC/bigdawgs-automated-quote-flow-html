@@ -103,6 +103,10 @@ label.fl{font-family:'IBM Plex Mono';font-size:10px;letter-spacing:.6px;text-tra
 .li-row.total{border-top:1px solid var(--line);margin-top:6px;padding-top:10px;font-family:'Big Shoulders Display';font-weight:800;font-size:18px;color:var(--ink);}
 .li-row.total span:last-child{color:var(--hi);font-family:'Big Shoulders Display';font-weight:800;font-size:20px;}
 
+.thanks-sub{color:var(--dim);font-size:12px;line-height:1.5;text-align:center;margin-top:14px;padding:0 8px;}
+.thanks-sub a{color:var(--gold);font-weight:600;text-decoration:none;}
+.thanks-sub a:hover{text-decoration:underline;}
+
 .out{border-radius:12px;padding:36px 24px;text-align:center;margin-bottom:14px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);}
 .out.book{background:var(--gold);color:var(--ink)}
 .out h2{font-family:'Big Shoulders Display';font-weight:800;font-size:36px;line-height:1.05;margin-bottom:12px}
@@ -162,6 +166,44 @@ label.fl{font-family:'IBM Plex Mono';font-size:10px;letter-spacing:.6px;text-tra
 
 <script>
 let A={},idx=0,fired=null;
+
+/* ============================================================================
+   HUBSPOT INTEGRATION
+   The Forms API is the safe, public-endpoint way to post leads from a static
+   HTML page — no auth token lives in the browser. To activate:
+
+   1. In HubSpot: Marketing → Forms → Create form → "Embedded form"
+      Name it "Big Dawgs Quote Flow" (or similar).
+      Add these fields (use existing contact properties, or create custom ones
+      as single-line text where noted):
+        - firstname                 (contact prop)
+        - lastname                  (contact prop)
+        - phone                     (contact prop)
+        - email                     (contact prop)
+        - address                   (contact prop; or custom single-line text)
+        - vehicle                   (custom single-line text)
+        - package_selected          (custom single-line text)
+        - estimated_price           (custom single-line text)
+        - requested_date            (custom single-line text)
+        - requested_time            (custom single-line text)
+        - symptoms                  (custom multi-line text)
+        - source                    (custom single-line text)
+      Publish.
+
+   2. Grab the form's GUID from the URL (looks like a UUID) and paste it into
+      HUBSPOT_FORM_GUID below.
+
+   3. To get the new-lead email to leads@bigdawgsdetailing.us:
+      Automation → Workflows → Create workflow → "From scratch, Contact-based"
+      Enrollment trigger: Form submission → the form you just made
+      Action: Send internal email notification → to leads@bigdawgsdetailing.us
+      Turn it on.
+
+   Portal ID (245895086) is Logan's HubSpot account ID. The Forms API endpoint
+   is public per-form and scoped to just creating submissions on that form ID.
+   ============================================================================ */
+const HUBSPOT_PORTAL_ID = '245895086';
+const HUBSPOT_FORM_GUID = ''; // <— paste the form GUID here to activate submissions
 const P=new URLSearchParams(location.search);
 if(P.get('type'))A.type=P.get('type');
 if(P.get('src'))A.src=P.get('src');
@@ -783,86 +825,55 @@ function scrContact(){
 }
 
 function submitLead() {
-    // -----------------------------------------------------------------------------
-    // API INTEGRATION BLANKS
-    // -----------------------------------------------------------------------------
-    
-    const payload = {
-        customer: {
-            name: A.name,
-            phone: A.phone,
-            email: A.email,
-            address: A.addr || A.marina + " " + (A.slip || "")
-        },
-        vehicle: A.desc,
-        packageSelected: A.finalPkgName,
-        estimatedPrice: A.finalPrice,
-        requestedDate: A.date,
-        requestedTime: A.time,
-        source: A.src,
-        symptoms: chosen().map(c=>c.q).join(', ')
-    };
+    const nameParts = (A.name||'').trim().split(/\s+/);
+    const firstname = nameParts[0] || '';
+    const lastname  = nameParts.slice(1).join(' ');
+    const address   = A.addr || [A.marina, A.slip].filter(Boolean).join(' ');
+    const symptoms  = chosen().map(c=>c.q).join(', ');
 
-    console.log("Preparing to send lead data:", payload);
-
-    /* 
-    // TODO: ZAPIER / MAKE WEBHOOK
-    // Link this to a Catch Hook in Zapier to route to any apps you want.
-    fetch('YOUR_ZAPIER_WEBHOOK_URL_HERE', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-    }).catch(err => console.error("Webhook Error:", err));
-    */
-
-    /*
-    // TODO: HUBSPOT API
-    // Create a new Contact / Deal directly via HubSpot
-    fetch('https://api.hubapi.com/crm/v3/objects/contacts', {
-        method: 'POST',
-        headers: { 'Authorization': 'Bearer YOUR_HUBSPOT_ACCESS_TOKEN', 'Content-Type': 'application/json' },
-        body: JSON.stringify({ properties: { email: A.email, firstname: A.name, phone: A.phone } })
-    });
-    */
-
-    /*
-    // TODO: SETMORE API
-    // Create a customer / hold a slot
-    // Requires getting a token first from https://developer.setmore.com/
-    */
-
-    /*
-    // TODO: NOTIFICATION EMAIL (e.g., via SendGrid or Postmark)
-    // Send email to Heath.Turner@bigdawgsdetailing.us
-    fetch('https://api.sendgrid.com/v3/mail/send', {
-        method: 'POST',
-        headers: { 'Authorization': 'Bearer YOUR_SENDGRID_API_KEY', 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            personalizations: [{ to: [{ email: "Heath.Turner@bigdawgsdetailing.us" }] }],
-            from: { email: "no-reply@bigdawgsdetailing.us" },
-            subject: "New Booking Request: " + A.finalPkgName,
-            content: [{ type: "text/plain", value: JSON.stringify(payload, null, 2) }]
-        })
-    });
-    */
-
-    /*
-    // TODO: GOOGLE TAG MANAGER / FACEBOOK PIXEL EVENT
-    if(typeof gtag === 'function') {
-        gtag('event', 'generate_lead', {
-            currency: 'USD',
-            value: payload.estimatedPrice.replace(/[^0-9.-]+/g,"") // strips dollar sign
-        });
+    // Post to HubSpot Forms API — public endpoint, no secret token needed.
+    // Skips silently if the form GUID isn't set yet (see setup block near the top of this script).
+    if(HUBSPOT_FORM_GUID) {
+        const fields = [
+            {name:'firstname',        value:firstname},
+            {name:'lastname',         value:lastname},
+            {name:'phone',            value:A.phone||''},
+            {name:'email',            value:A.email||''},
+            {name:'address',          value:address},
+            {name:'vehicle',          value:A.desc||''},
+            {name:'package_selected', value:A.finalPkgName||''},
+            {name:'estimated_price',  value:String(A.finalPrice||'')},
+            {name:'requested_date',   value:A.date||''},
+            {name:'requested_time',   value:A.time||''},
+            {name:'symptoms',         value:symptoms},
+            {name:'source',           value:A.src||''}
+        ];
+        fetch(`https://api.hsforms.com/submissions/v3/integration/submit/${HUBSPOT_PORTAL_ID}/${HUBSPOT_FORM_GUID}`, {
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({
+                fields,
+                context:{pageUri:location.href, pageName:document.title}
+            })
+        }).catch(err => console.error('HubSpot submit failed:', err));
+    } else {
+        console.warn('HUBSPOT_FORM_GUID is not set — lead not posted. See setup block at top of script.');
     }
-    */
-    
-    // Advance to final visual screen
+
+    // Advance to final visual screen (fires even if HubSpot call fails, so the customer
+    // still sees confirmation — network hiccups shouldn't break the booking flow).
     idx++;
     render();
 }
 
 function scrOutcome(){
   // Final Success Screen presented to the customer.
+  if(A.type==='boat' || A.type==='rv'){
+    return `<div class="out book">
+      <h2>THANK YOU FOR CHOOSING BIG DAWGS!</h2>
+      </div>
+      <div class="thanks-sub">A member of our team will reach out within 24 hrs to confirm! For questions or same-day bookings call <a href="tel:+15809165189">580-916-5189</a>.</div>`;
+  }
   return `<div class="out book">
     <h2>YOU'RE ON THE BOOK</h2>
     <p>We have received your request for the <b>${A.finalPkgName}</b> package.</p>
