@@ -204,6 +204,33 @@ let A={},idx=0,fired=null;
    ============================================================================ */
 const HUBSPOT_PORTAL_ID = '245895086';
 const HUBSPOT_FORM_GUID = 'd86a43ad-c65d-48ca-818a-9b025d43347d'; // Big Dawgs Quote Flow form
+
+/* ============================================================================
+   ANALYTICS + PIXEL + CHAT — set the IDs to activate each. Empty = disabled.
+
+   GA4_MEASUREMENT_ID:
+     analytics.google.com → Admin → Create Property → Data Streams → Web
+     Copy the "Measurement ID" (looks like G-XXXXXXXXXX). Paste below.
+     Fires page_view on load + generate_lead on outcome screen.
+
+   META_PIXEL_ID:
+     business.facebook.com → Events Manager → Data Sources → Web
+     Copy the 16-digit Pixel ID. Paste below.
+     Fires PageView on load + Lead on outcome screen.
+     Only wire this up if you'll actually run Meta ads or retarget.
+
+   GEMINI_API_KEY:
+     aistudio.google.com → Get API key → Create API key. Free tier.
+     SECURITY: In Google Cloud Console → APIs & Credentials → this key →
+     Application restrictions → HTTP referrers → allow only
+     "bigdawgsdetailingllc.github.io/*". Then Set a quota/spend cap.
+     Without those restrictions the key is scrape-able and abusable.
+     Powers the "Ask a Detailer" chat bubble at bottom-right.
+   ============================================================================ */
+const GA4_MEASUREMENT_ID = ''; // e.g. 'G-XXXXXXXXXX'
+const META_PIXEL_ID      = ''; // e.g. '1234567890123456'
+const GEMINI_API_KEY     = ''; // paste from aistudio.google.com
+
 const P=new URLSearchParams(location.search);
 if(P.get('type'))A.type=P.get('type');
 if(P.get('src'))A.src=P.get('src');
@@ -824,6 +851,46 @@ function scrContact(){
   return h;
 }
 
+function initTracking(){
+    // GA4
+    if(GA4_MEASUREMENT_ID){
+        const s=document.createElement('script');
+        s.async=true;
+        s.src='https://www.googletagmanager.com/gtag/js?id='+GA4_MEASUREMENT_ID;
+        document.head.appendChild(s);
+        window.dataLayer=window.dataLayer||[];
+        window.gtag=function(){dataLayer.push(arguments);};
+        gtag('js', new Date());
+        gtag('config', GA4_MEASUREMENT_ID, {anonymize_ip:true});
+    }
+    // Meta Pixel
+    if(META_PIXEL_ID){
+        !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init', META_PIXEL_ID);
+        fbq('track', 'PageView');
+    }
+}
+
+function fireLeadConversion(){
+    const value = parseFloat(String(A.finalPrice||'').replace(/[^0-9.]/g,'')) || 0;
+    if(typeof gtag === 'function'){
+        gtag('event', 'generate_lead', {
+            currency:'USD',
+            value:value,
+            lead_type:A.type,
+            package_selected:A.finalPkgName||''
+        });
+    }
+    if(typeof fbq === 'function'){
+        fbq('track', 'Lead', {
+            currency:'USD',
+            value:value,
+            content_name:A.finalPkgName||'',
+            content_category:A.type||''
+        });
+    }
+}
+
 function submitLead() {
     const nameParts = (A.name||'').trim().split(/\s+/);
     const firstname = nameParts[0] || '';
@@ -859,6 +926,9 @@ function submitLead() {
     } else {
         console.warn('HUBSPOT_FORM_GUID is not set — lead not posted. See setup block at top of script.');
     }
+
+    // Fire GA4 + Meta Pixel conversion events (only fire if their IDs are configured)
+    fireLeadConversion();
 
     // Advance to final visual screen (fires even if HubSpot call fails, so the customer
     // still sees confirmation — network hiccups shouldn't break the booking flow).
@@ -966,20 +1036,32 @@ async function sendChatMessage() {
     input.value = '';
     document.getElementById('chatSend').disabled = true;
 
-    // TODO: Insert your valid Gemini API Key here if you wish to use the AI detailer chat widget.
-    const apiKey = ""; 
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`;
 
-    if (!apiKey) {
+    if (!GEMINI_API_KEY) {
         setTimeout(() => {
-             appendChatMessage("The AI assistant is currently offline. Please configure the API Key in the source code.", 'bot');
+             appendChatMessage("Chat is offline right now — text or call Logan at 580-916-5189 and he'll answer straight.", 'bot');
              document.getElementById('chatSend').disabled = false;
         }, 500);
         return;
     }
 
     let R = {}; if (A.type) R = recommend() || {};
-    const systemPrompt = `You are an expert detailer at Big Dawgs Detailing helping a customer understand their quote process. Keep answers to 1-2 short paragraphs max. Current Customer Context: Vehicle Type: ${A.type}, Package Recommended: ${R.name}. Answer specifically referencing their inputs.`;
+    const systemPrompt = `You are Logan at Big Dawgs Detailing — a mobile detailer working out of Lake Texoma, OK (SE Oklahoma / N Texas). You handle cars, trucks, boats, pontoons, and RVs.
+
+Voice rules:
+- Direct, honest, no fluff, no sales-speak. Talk like a straight-shooting detailer at a truck stop, not a chatbot.
+- Never invent prices — if asked for a price outside their current quote, tell them the quote flow is the fastest way to get one, or say you'll look at it in person.
+- 1–3 sentences max unless they specifically ask for more detail.
+- Never promise things you can't deliver. Correction paint, chalked gelcoat, and heavy oxidation all get quoted in person — say so.
+- No emoji, no exclamation-point salesy tone. Confident but calm.
+
+Current customer context:
+- Vehicle type: ${A.type||'(not selected yet)'}
+- Recommended package: ${R.name||'(not diagnosed yet)'}
+- Estimated price: ${A.finalPrice||'(not booked yet)'}
+
+If they ask about something not in that context, help them without pretending you have data you don't have. If they clearly want to book, tell them to hit the Continue button in the quote flow to lock in the price and date.`;
 
     chatHistory.push({ role: "user", parts: [{ text: text }] });
     const payload = { contents: chatHistory, systemInstruction: { parts: [{ text: systemPrompt }] } };
@@ -1006,6 +1088,7 @@ async function sendChatMessage() {
     }
 }
 
+initTracking();
 render();
 </script>
 </body>
