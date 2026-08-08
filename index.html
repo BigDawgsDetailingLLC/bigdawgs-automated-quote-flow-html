@@ -830,7 +830,16 @@ function scrContact(){
        </div>
    </div>
 
-   <label class="fl">Name</label><input type="text" value="${A.name||''}" oninput="A.name=this.value;paint()">
+   <div class="two">
+       <div>
+           <label class="fl">First Name</label>
+           <input type="text" value="${A.firstname||''}" oninput="A.firstname=this.value;A.name=(A.firstname||'')+' '+(A.lastname||'');paint()">
+       </div>
+       <div>
+           <label class="fl">Last Name</label>
+           <input type="text" value="${A.lastname||''}" oninput="A.lastname=this.value;A.name=(A.firstname||'')+' '+(A.lastname||'');paint()">
+       </div>
+   </div>
    <label class="fl">Phone</label><input type="tel" value="${A.phone||''}" oninput="A.phone=this.value;paint()">
    <label class="fl">Email</label><input type="email" value="${A.email||''}" oninput="A.email=this.value;paint()">
    <label class="fl">${A.type==='boat'&&A.lives==='slip'?'Marina':'Address where it sits'}</label>`;
@@ -909,9 +918,12 @@ function fireLeadConversion(){
 }
 
 function submitLead() {
+    // Prefer explicit firstname/lastname fields (new). Fall back to splitting A.name
+    // (for backwards compat if any old cached form was still using single-name).
     const nameParts = (A.name||'').trim().split(/\s+/);
-    const firstname = nameParts[0] || '';
-    const lastname  = nameParts.slice(1).join(' ');
+    const firstname = A.firstname || nameParts[0] || '';
+    const lastname  = A.lastname  || nameParts.slice(1).join(' ');
+    if(!A.name) A.name = (firstname+' '+lastname).trim();
     const address   = A.addr || [A.marina, A.slip].filter(Boolean).join(' ');
     const symptoms  = chosen().map(c=>c.q).join(', ');
 
@@ -1055,7 +1067,7 @@ function canAdvance(id){
   if(id==='rec') return !recommend().nothing;   
   if(id==='symptoms'||id==='outcome')return true;
   if(id==='contact'){
-    if(!(A.name&&A.phone&&A.email&&A.date&&A.time))return false;
+    if(!(A.firstname&&A.lastname&&A.phone&&A.email&&A.date&&A.time))return false;
     if(A.type==='boat'&&A.lives==='slip')return !!A.marina;
     return !!A.addr;
   }
