@@ -60,9 +60,10 @@ label.fl{font-family:'IBM Plex Mono';font-size:10px;letter-spacing:.6px;text-tra
 .inc li:last-child{border:0}
 .inc li:before{content:'';position:absolute;left:4px;top:16px;width:6px;height:6px;background:var(--gold);border-radius:50%}
 
-.missing-list { list-style:none; margin-top: 8px; margin-bottom: 16px; opacity: 0.8;}
-.missing-list li { font-size:14px; color:var(--dim); padding:6px 0 6px 24px; position:relative; text-decoration: line-through;}
-.missing-list li:before { content:'✕'; position:absolute; left:4px; top:6px; font-size: 10px; color: var(--warn); }
+.extras-list{list-style:none;margin-top:8px;margin-bottom:16px;}
+.extras-list li{font-size:14px;color:var(--ink);padding:8px 0 8px 26px;position:relative;border-bottom:1px solid var(--bg-alt);}
+.extras-list li:last-child{border:0;}
+.extras-list li:before{content:'✓';position:absolute;left:4px;top:8px;color:var(--gold);font-weight:800;font-size:14px;}
 
 .alt{border:1px solid var(--line);border-radius:12px;padding:24px 22px;margin-bottom:24px;background:var(--panel); box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.03);}
 .alt b{font-family:'IBM Plex Mono';font-size:10px;letter-spacing:.7px;text-transform:uppercase;color:var(--dim);display:block;margin-bottom:6px; font-weight: 500}
@@ -75,6 +76,21 @@ label.fl{font-family:'IBM Plex Mono';font-size:10px;letter-spacing:.6px;text-tra
 .btn-book:hover { background: var(--hi); transform: translateY(-2px); box-shadow: 0 6px 10px rgba(216, 178, 88, 0.4); }
 .btn-book.alt-book { background: var(--panel); border: 2px solid var(--gold); box-shadow: none; color: var(--ink); }
 .btn-book.alt-book:hover { background: var(--btn-hover); transform: translateY(-1px); }
+
+.maint{border:1px solid var(--line);border-radius:12px;padding:20px 22px;margin-bottom:24px;background:var(--panel);}
+.maint-toggle{display:flex;gap:12px;align-items:flex-start;cursor:pointer;font-size:15px;color:var(--ink);font-weight:600;line-height:1.4;}
+.maint-toggle input{margin-top:3px;width:18px;height:18px;accent-color:var(--gold);cursor:pointer;flex:none;}
+.maint-body{margin-top:6px;}
+.maint-body > p{font-size:14px;color:var(--cream);margin:10px 0 14px;}
+.maint-opt{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start;padding:14px;border:1px solid var(--line);border-radius:8px;margin-bottom:10px;cursor:pointer;transition:.15s ease;background:var(--bg-alt);}
+.maint-opt:hover{border-color:var(--gold);}
+.maint-opt.sel{border-color:var(--gold);background:var(--panel);box-shadow:0 2px 6px rgba(216,178,88,.15);}
+.maint-opt input{margin-top:3px;accent-color:var(--gold);cursor:pointer;}
+.maint-opt-body{display:block;min-width:0;}
+.maint-opt-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;}
+.maint-opt-top b{font-family:'Big Shoulders Display';font-size:20px;font-weight:800;color:var(--ink);line-height:1.1;}
+.maint-opt-price{font-family:'IBM Plex Mono';color:var(--gold);font-size:13px;font-weight:600;}
+.maint-opt-note{display:block;font-size:13px;color:var(--dim);margin-top:4px;}
 
 .out{border-radius:12px;padding:36px 24px;text-align:center;margin-bottom:14px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);}
 .out.book{background:var(--gold);color:var(--ink)}
@@ -150,6 +166,14 @@ const AUTO_PKG={
  sig   :{n:'Signature',          p:{car:249,truck:299,van:339},  inc:['Foam wash and hand dry', 'Clay bar and iron decontamination','6-month protective paint sealant', 'Full interior vacuum and surface wipe-down', 'Interior deep clean and dressing application']},
  elite :{n:'Elite',              p:{car:379,truck:449,van:509},  inc:['Foam wash, clay bar, and iron decontamination','One-step machine polish on painted surfaces','6-month protective paint sealant','Hot water extraction on interior carpets/cloth','Leather cleaned and conditioned','Engine bay cleaned and dressed']}
 };
+
+const CERAMIC_START={auto:399, boat:599, rv:599};
+
+const MAINT_PLANS=[
+ {id:'biweekly', label:'Every 2 weeks',  price:250, note:'Highest freshness. Least buildup between visits.'},
+ {id:'monthly',  label:'Monthly',        price:300, note:'The sweet spot for daily drivers.'},
+ {id:'quarterly',label:'Every 3 months', price:450, note:'Reset it four times a year. More work per visit.'}
+];
 
 const AUTO_SYMPTOMS=[
  {id:'pets',   q:'Pets ride in it',                 add:40, in:1},
@@ -234,9 +258,16 @@ function recommend(){
     if(heavy.length) why.push('You flagged '+list(heavy)+'. That is extra hours on the same job, and it is already in the number — not a surprise at the truck.');
 
     const LADDER={exp:'decon',decon:'extrest',int:'intdeep',std:'sig',sig:'elite'};
-    const altMap={std:{k:'sig',t:'Step up'},sig:{k:'elite',t:'Step up'},elite:{k:'sig',t:'Lighter option'},
-                  int:{k:'intdeep',t:'Step up'},intdeep:{k:'int',t:'Lighter option'},
-                  exp:{k:'decon',t:'Step up'},decon:{k:'extrest',t:'Step up'},extrest:{k:'decon',t:'Lighter option'}};
+    const altMap={std:{k:'sig'},sig:{k:'elite'},
+                  int:{k:'intdeep'},
+                  exp:{k:'decon'},decon:{k:'extrest'}};
+    const UPGRADE_EXTRAS={
+      std:['Clay bar and iron decontamination','6-month protective paint sealant','Interior deep clean and dressing application'],
+      sig:['One-step machine polish on painted surfaces','Hot water extraction on interior carpets/cloth','Leather cleaned and conditioned','Engine bay cleaned and dressed'],
+      int:['Hot water extraction on carpet and cloth seats','Leather cleaned and conditioned','Professional odor treatment'],
+      exp:['Clay bar decontamination treatment','Iron and tar chemical removal','6-month protective paint sealant'],
+      decon:['One-step machine polish on all painted surfaces','Swirls and light scratches knocked down']
+    };
     let total=base+surcharge, crossover=null;
     const up=LADDER[key];
     if(up&&total+60>=AUTO_PKG[up].p[cls]&&AUTO_PKG[up].p[cls]>total){
@@ -245,8 +276,9 @@ function recommend(){
     }
     const alt=altMap[key];
     return {key,name:pkg.n,inc:pkg.inc,exact:true,price:[total,total],base,surcharge,why,crossover,
-      alt:alt?{k:alt.k, t:alt.t, n:AUTO_PKG[alt.k].n, p:money(AUTO_PKG[alt.k].p[cls]), inc:AUTO_PKG[alt.k].inc}:null,
+      alt:alt?{k:alt.k, n:AUTO_PKG[alt.k].n, p:money(AUTO_PKG[alt.k].p[cls]), extras:UPGRADE_EXTRAS[key]||[]}:null,
       ceramic:(key==='elite'||key==='sig'||key==='extrest')&&E<4,
+      ceramicUpsell:(key==='elite'||key==='intdeep'||key==='extrest'),
       correction:E===4, spread:0};
   }
 
@@ -288,7 +320,9 @@ function recommend(){
     if(flagged.length) why.push('You flagged '+list(flagged)+'.');
 
     return {key,name,inc:boatInc(key,N?'both':'out'),exact:false,price:[r5(r[0]),r5(r[1])],why,
-      ceramic:(key==='L2'||key==='L3'), spread:Math.round((r[1]/r[0]-1)*100),
+      ceramic:(key==='L2'||key==='L3'),
+      ceramicUpsell:(key==='L2'||key==='L3'),
+      spread:Math.round((r[1]/r[0]-1)*100),
       whyRange: key==='L3'?'Some hulls come back in two passes. Some take four. That is the whole spread.':
                 key==='L2'?'Where it lands depends on how the gelcoat responds to the first pass.':
                 key==='int'?'Depends what is set into the vinyl versus sitting on top of it.':
@@ -317,6 +351,7 @@ function recommend(){
     if(flagged.length) why.push('You flagged '+list(flagged)+'.');
     return {key,name,inc:rvInc(key,roof),exact:false,price:[r5(r[0]),r5(r[1])],why,
       ceramic:(key==='full'||key==='ox'),
+      ceramicUpsell:(key==='full'||key==='ox'),
       spread:Math.round((r[1]/r[0]-1)*100),
       whyRange: key==='ox'?'Some sidewalls come back in two passes. Some take four.':
                 key==='full'?'Depends how much gloss is left to bring back.':
@@ -484,7 +519,19 @@ function scrSymptoms(){
 function pickPkg(pkgName, pkgPrice) {
     A.finalPkgName = pkgName;
     A.finalPrice = pkgPrice;
+    A.maintDiscount = (A.maint && A.maintPlan) ? 0.10 : 0;
     next();
+}
+
+function toggleMaint(on) {
+    A.maint = on;
+    if(!on) A.maintPlan = null;
+    render();
+}
+
+function pickMaint(id) {
+    A.maintPlan = id;
+    render();
 }
 
 function scrRec(){
@@ -518,34 +565,69 @@ function scrRec(){
     Scratches and swirls are the only thing I will not price off a form. How much comes out depends on how thick the clear coat is,
     and I cannot see that from here. I will look at it in person and tell you straight what will and will not come out.</div>`;
     
-  // Lower Tier / Alternative package rendering with its own Book Button
+  // Second card: upgrade path (mid-ladder) OR ceramic upsell (top of ladder). Never both.
   if(R.alt) {
       h+=`<div class="alt">
-            <b>${R.alt.t}</b>
+            <b>Level Up</b>
             <div class="alt-name">${R.alt.n}</div>
             <span class="r">${R.alt.p}</span>
-            <p style="color:var(--cream);font-size:14px;margin-bottom:8px">If you want to save some money, we can step down to this package.</p>
-            <p style="color:var(--ink);font-weight:600;font-size:14px;margin-top:16px;">This Includes:</p>
+            <p style="color:var(--cream);font-size:14px;margin-bottom:12px">
+              Want the full experience? Step up to ${R.alt.n} and get everything above, plus more.
+            </p>
+            <p style="color:var(--ink);font-weight:600;font-size:14px;margin-top:16px;">Everything in ${R.name}:</p>
             <ul class="inc" style="margin-top:6px; margin-bottom:12px;">`;
-      
-      R.alt.inc.forEach(i => { h+= `<li>${i}</li>`; });
+      R.inc.forEach(i => { h+= `<li>${i}</li>`; });
       h+=`</ul>`;
-      
-      // Calculate what they miss out on by comparing arrays
-      if(R.inc && R.inc.length > 0) {
-          const missing = R.inc.filter(item => !R.alt.inc.includes(item));
-          if(missing.length > 0) {
-              h+= `<p style="color:var(--warn);font-weight:600;font-size:14px;">What you'll miss out on:</p>
-                   <ul class="missing-list">`;
-              missing.forEach(i => { h+= `<li>${i}</li>`; });
-              h+= `</ul>`;
-          }
+
+      if(R.alt.extras && R.alt.extras.length > 0) {
+          h+= `<p style="color:var(--gold);font-weight:600;font-size:14px;margin-top:14px;">You also get:</p>
+               <ul class="extras-list">`;
+          R.alt.extras.forEach(i => { h+= `<li>${i}</li>`; });
+          h+= `</ul>`;
       }
 
-      h+=`<button class="btn-book alt-book" onclick="pickPkg('${R.alt.n}', '${R.alt.p}')">Book ${R.alt.n} Instead</button>
+      h+=`<button class="btn-book alt-book" onclick="pickPkg('${R.alt.n}', '${R.alt.p}')">Upgrade to ${R.alt.n}</button>
+          </div>`;
+  } else if(R.ceramicUpsell) {
+      const startPrice = CERAMIC_START[A.type];
+      h+=`<div class="alt">
+            <b>Lock It In</b>
+            <div class="alt-name">Ceramic Coating</div>
+            <span class="r">Starting at ${money(startPrice)}</span>
+            <p style="color:var(--cream);font-size:14px;margin-bottom:12px">
+              You are already putting it in the top package — protect the work. Ceramic keeps the paint slick, beading, and easier to wash for years, not weeks. Final number depends on the paint, I quote it in person.
+            </p>
+            <ul class="extras-list">
+              <li>Long-term paint protection, not a two-week sealant</li>
+              <li>Water and dirt slide off — washes take half the time</li>
+              <li>UV and chemical resistance so the color holds</li>
+            </ul>
+            <button class="btn-book alt-book" onclick="pickPkg('${R.name} + Ceramic Coating', 'Quoted in person')">Add Ceramic Coating</button>
           </div>`;
   }
-  
+
+  // Maintenance plan checkbox — every rec, all vehicle types
+  h+=`<div class="maint">
+        <label class="maint-toggle">
+          <input type="checkbox" ${A.maint?'checked':''} onchange="toggleMaint(this.checked)">
+          <span>Want me to keep it this clean? Save 10% today when you set up a maintenance plan.</span>
+        </label>`;
+  if(A.maint) {
+      h+=`<div class="maint-body">
+            <p>Pick how often. Less often = more built-up dirt on the truck, so the per-visit price steps up.</p>`;
+      MAINT_PLANS.forEach(p => {
+          h+=`<label class="maint-opt ${A.maintPlan===p.id?'sel':''}">
+                <input type="radio" name="maintPlan" value="${p.id}" ${A.maintPlan===p.id?'checked':''} onchange="pickMaint('${p.id}')">
+                <span class="maint-opt-body">
+                  <span class="maint-opt-top"><b>${p.label}</b><span class="maint-opt-price">Starting at ${money(p.price)}/visit</span></span>
+                  <span class="maint-opt-note">${p.note}</span>
+                </span>
+              </label>`;
+      });
+      h+=`</div>`;
+  }
+  h+=`</div>`;
+
   return h;
 }
 
