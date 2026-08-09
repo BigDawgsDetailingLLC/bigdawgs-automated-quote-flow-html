@@ -196,10 +196,10 @@ let A={},idx=0,fired=null;
    2. Grab the form's GUID from the URL (looks like a UUID) and paste it into
       HUBSPOT_FORM_GUID below.
 
-   3. To get the new-lead email to leads@bigdawgsdetailing.us:
+   3. To get the new-lead email to bigdawgsdetails@gmail.com:
       Automation → Workflows → Create workflow → "From scratch, Contact-based"
       Enrollment trigger: Form submission → the form you just made
-      Action: Send internal email notification → to leads@bigdawgsdetailing.us
+      Action: Send internal email notification → to bigdawgsdetails@gmail.com
       Turn it on.
 
    Portal ID (245895086) is Logan's HubSpot account ID. The Forms API endpoint
@@ -991,13 +991,13 @@ function submitLead() {
         showDebugToast('HUBSPOT_FORM_GUID is empty in the code — nothing was sent to HubSpot.', 'err');
     }
 
-    // Direct email backup — always fires an email to leads@bigdawgsdetailing.us via
+    // Direct email backup — always fires an email to bigdawgsdetails@gmail.com via
     // FormSubmit (free, no signup, no API key). This is the guaranteed notification path
     // — HubSpot still runs above for CRM records, but Logan gets the actual email from
     // here. FIRST submission after wiring this up triggers a one-time confirmation email
     // from FormSubmit — click the link inside to activate the address, then every
     // future submission emails Logan directly with the full lead info.
-    fetch('https://formsubmit.co/ajax/leads@bigdawgsdetailing.us', {
+    fetch('https://formsubmit.co/ajax/bigdawgsdetails@gmail.com', {
         method:'POST',
         headers:{'Content-Type':'application/json','Accept':'application/json'},
         body:JSON.stringify({
@@ -1022,7 +1022,7 @@ function submitLead() {
         const bodyText = await r.text();
         if(r.ok) {
             console.log('FormSubmit email OK:', r.status);
-            showDebugToast('OK — email notification fired to leads@bigdawgsdetailing.us', 'ok');
+            showDebugToast('OK — email notification fired to bigdawgsdetails@gmail.com', 'ok');
         } else {
             console.error('FormSubmit failed:', r.status, bodyText);
             showDebugToast('Email backup failed (HTTP '+r.status+'): '+bodyText.slice(0,200), 'err');
