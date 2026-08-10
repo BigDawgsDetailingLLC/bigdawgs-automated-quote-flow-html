@@ -368,18 +368,18 @@ function recommend(){
     const covered=key==='elite'||key==='intdeep'||key==='extrest';
     let surcharge=covered?Math.round(addOn*0.4):addOn;
 
-    const EW={1:'The paint is fine, it is just dirty. That is a wash, not correction work, and you should not pay correction prices for it.',
-              2:'Water not beading anymore means the protection is gone. Decontamination and a sealant, so it stays looking right instead of two weeks.',
-              3:'Swirls you catch in the sun are the one thing washing cannot fix. That takes a machine polish, and that is what moves this up.',
-              4:'Dull or sat-under-a-tree paint is a full reset. This is the job where saving fifty dollars costs you the result.'};
-    const IW={1:'Inside is already clean, so this is a refresh. No reason to pay for a restore you do not need.',
-              2:'Normal lived-in is the everyday job. Full vacuum, every surface, windows.',
-              3:'Used hard means the dirt is in the carpet, not on it. That takes extraction, not a vacuum.',
-              4:'Something set in. Stains and smell come out with hot water extraction and an odor treatment, and that is priced in.'};
-    if(E) why.push(EW[E]); else why.push('You said the outside is fine, so nothing out there gets touched and you are not paying for it.');
-    if(I) why.push(IW[I]); else why.push('You said the inside is fine. Leaving it alone, and leaving it off your bill.');
+    const EW={1:"Paint's fine, just dirty. Straight wash gets it done.",
+              2:"Water's not beading anymore, so the old sealant is gone. Wash, decon, sealant. Back to slick and it'll hold for months.",
+              3:"Swirls you catch in the sun only come out with a machine polish. That's what bumps this up a tier.",
+              4:"Chalky or sat-under-a-tree paint is a full reset. Compound, polish, then seal. No shortcuts."};
+    const IW={1:"Inside's basically clean already. Quick refresh and it's set.",
+              2:"Normal daily-driver interior. Full vacuum, every surface, windows.",
+              3:"Kids-and-dogs interior. The dirt's in the carpet, so extraction is the only thing that pulls it.",
+              4:"Something spilled or the smell's set in. Hot water extraction plus an odor treatment handles both, already priced in."};
+    if(E) why.push(EW[E]); else why.push("Outside is fine, so nothing out there gets touched. Not charging for it.");
+    if(I) why.push(IW[I]); else why.push("Inside is fine, so this is exterior only.");
     const heavy=chosen().filter(c=>c.add>0).map(c=>c.q.toLowerCase());
-    if(heavy.length) why.push('You flagged '+list(heavy)+'. That is extra hours on the same job, and it is already in the number — not a surprise at the truck.');
+    if(heavy.length) why.push("You flagged "+list(heavy)+". Priced in already — nothing extra shows up at the door.");
 
     const LADDER={exp:'decon',decon:'extrest',int:'intdeep',std:'sig',sig:'elite'};
     const altMap={std:{k:'sig'},sig:{k:'elite'},
@@ -431,9 +431,9 @@ function recommend(){
 
     const name = (e ? BOAT_EXT[e].n : '') + (e && i ? ' + ' : '') + (i ? BOAT_INT[i].n : '');
     const why = [];
-    if(e) why.push(BOAT_EXT[e].d); else why.push('You said the outside is fine. Not touching it, not charging for it.');
-    if(i) why.push(BOAT_INT[i].d); else why.push('You said the inside is fine, so this is exterior only.');
-    if(A.lives==='slip') why.push('Working it in the slip means everything happens off the dock. Slower than a trailer, and it is priced in — no day-of surprise.');
+    if(e) why.push(BOAT_EXT[e].d); else why.push("Outside is fine. Not touching it, not charging for it.");
+    if(i) why.push(BOAT_INT[i].d); else why.push("Inside is fine, so this one is exterior only.");
+    if(A.lives==='slip') why.push("Working it in the slip means everything happens off the dock. Slower than a trailer, and it's priced in — no day-of surprises.");
 
     const inc = [];
     if(e) inc.push(BOAT_EXT[e].n+' — exterior treatment at $'+BOAT_EXT[e].r[0]+'–$'+BOAT_EXT[e].r[1]+'/ft');
@@ -466,10 +466,10 @@ function recommend(){
       ceramicUpsell: topOfLadder,
       ft,
       spread: baseHi>0 ? Math.round((baseHi/baseLo-1)*100) : 0,
-      whyRange: e===4 ? 'Some hulls come back in two passes. Some take four. That is the whole spread.'
-              : e===3 ? 'Where it lands depends on how the gelcoat responds to the first pass.'
-              : i>=3  ? 'Depends what is set into the vinyl versus sitting on top of it.'
-              :         'Predictable work. The spread just covers how much is actually on it.'
+      whyRange: e===4 ? "Some hulls come back in two passes. Some take four. That's the whole spread."
+              : e===3 ? "Where it lands depends on how the gelcoat responds to the first pass."
+              : i>=3  ? "Depends what's set into the vinyl vs. what's sitting on top of it."
+              :         "The spread just covers how much is actually on it."
     };
   }
 
@@ -484,15 +484,15 @@ function recommend(){
     chosen().forEach(c=>{ if(c.ft)r=[r[0]+r5(c.ft[0]*feet()),r[1]+r5(c.ft[1]*feet())];
                           else if(c.flat)r=[r[0]+c.flat[0],r[1]+c.flat[1]]; });
     const why=[];
-    if(key==='seal')why.push('Sidewalls are carrying road film and bugs, nothing worse. Wash plus a sealant so the next one comes off easier — that is the whole job.');
-    if(key==='full')why.push('The sidewalls have gone flat. Wash, decontaminate, machine polish, then seal. This is the stage where the gloss still comes back without a full cut.');
-    if(key==='ox')  why.push('Chalk that comes off on your hand means the clear coat is oxidized. Multi-step machine work, and over 35 feet that is a two-day job.');
-    if(A.roof==='streaks') why.push('Those streaks are coming off the roof, not the sidewalls. Cleaning the sides without the roof means they are back by fall, so the roof is in the price.');
-    else if(A.roof==='old')why.push('A year or more without a roof cleaning is where the streaks and the seal problems start. Roof is in the price, and we tell you what the seals look like while we are up there.');
-    else if(A.roof==='idk')why.push('Most people never get up there. We will, it is in the price, and you get told straight what the seals look like.');
-    else                   why.push('Roof was done recently, so it is left off and left off your bill.');
+    if(key==='seal')why.push("Sidewalls are carrying road film and bugs. Wash and seal so the next one comes off easier — that's the whole job.");
+    if(key==='full')why.push("Sidewalls have gone flat. Wash, decon, machine polish, then seal. This is the stage where the gloss still comes back easy.");
+    if(key==='ox')  why.push("Chalky sidewalls means the clear coat is oxidized. Compound, polish, then seal — multi-step machine work. Over 35 feet it stretches to two days.");
+    if(A.roof==='streaks') why.push("Those streaks are coming off the roof, not the sidewalls. Doing the sides without the roof means they're back by fall — so the roof is in the price.");
+    else if(A.roof==='old')why.push("A year or more without a roof cleaning is where the streaks and the seal problems start. Roof is in the price, and I'll tell you what the seals look like while I'm up there.");
+    else if(A.roof==='idk')why.push("Most people never get up there. I will — it's in the price, and you'll get told straight what the seals look like.");
+    else                   why.push("Roof was done recently, so it's left off and left off the bill.");
     const flagged=chosen().map(c=>c.q.toLowerCase());
-    if(flagged.length) why.push('You flagged '+list(flagged)+'.');
+    if(flagged.length) why.push("You flagged "+list(flagged)+". Priced in.");
     const RV_ALT={seal:'full', full:'ox'};
     const RV_EXTRAS={
       seal:['Full decontamination pass before polish','Machine polish on the sidewalls to bring back gloss','Wheels and wells cleaned'],
@@ -513,9 +513,9 @@ function recommend(){
       ceramic:(key==='full'||key==='ox'),
       ceramicUpsell:(key==='ox'),
       spread:Math.round((r[1]/r[0]-1)*100),
-      whyRange: key==='ox'?'Some sidewalls come back in two passes. Some take four.':
-                key==='full'?'Depends how much gloss is left to bring back.':
-                             'Predictable work. The spread covers road film and bug load.'};
+      whyRange: key==='ox'?"Some sidewalls come back in two passes. Some take four.":
+                key==='full'?"Depends how much gloss is left to bring back.":
+                             "The spread covers road film and bug load."};
   }
   return {hand:'Multiple vehicles get a real proposal, not a form price.'};
 }
@@ -580,7 +580,7 @@ a_ext:{h:'How does the paint look?',sub:'Walk out to it dry and look down the si
   {v:'3',l:'Light swirls and scratches',s:'You mostly see them in direct sun'},
   {v:'4',l:'Dull, faded, or been sitting under a tree',s:'Lost its gloss, maybe sap or spots baked in'},
   {v:'0',l:'Nothing wrong with it',s:'Leave the outside alone'}]},
-a_int:{h:'How does the inside look?',sub:'Same thing. Honest answer gets you the right number.',k:'int',o:[
+a_int:{h:'How does the inside look?',sub:'Same idea. Straight answer, straight price.',k:'int',o:[
   {v:'1',l:'Clean. Just needs a refresh.',s:'Kept up, wiped down regularly'},
   {v:'2',l:'Normal lived-in',s:'Crumbs, dust, a few spots'},
   {v:'3',l:'It gets used hard',s:'Kids, dogs, or a work truck'},
@@ -628,9 +628,10 @@ f_freq:{h:'How often?',k:'ffreq',o:[
   {v:'once',l:'One time'},{v:'month',l:'Monthly'},{v:'2wk',l:'Every two weeks'},{v:'wk',l:'Weekly'}]}
 };
 
-function render(){
+function render(preserveScroll){
   const steps=buildSteps(); if(idx>=steps.length)idx=steps.length-1;
   const id=steps[idx]; let h='<div class="step">';
+  const scrollY = preserveScroll ? window.scrollY : 0;
   const nav = document.getElementById('bottomNav');
 
   if(id==='symptoms')      h+=scrSymptoms();
@@ -672,13 +673,13 @@ function render(){
   nx.textContent = id==='symptoms'?(chosen().length?'Continue':'None of these apply')
     : id==='contact'?'Submit Booking Request':'Continue';
     
-  window.scrollTo(0,0); 
+  if(preserveScroll) window.scrollTo(0, scrollY); else window.scrollTo(0,0);
 }
 
 function scrSymptoms(){
   const L=sym();
   let h=`<h1>Anything on this list?</h1>
-   <div class="sub">Check whatever applies. I am not selling you these — they change how long the same job takes, so I would rather know now than find out in your driveway.</div>`;
+   <div class="sub">Check whatever applies. I'm not upselling you — these change how long the same job takes, so I'd rather know now than find out in your driveway.</div>`;
   L.forEach(c=>{const on=A['s_'+c.id];
     h+=`<button class="opt${on?' sel':''}" onclick="tog('${c.id}')">
       <span class="chk"><span class="box">${on?'✓':''}</span><span>${c.q}</span></span></button>`;});
@@ -695,36 +696,35 @@ function pickPkg(pkgName, pkgPrice) {
 function toggleMaint(on) {
     A.maint = on;
     if(!on) A.maintPlan = null;
-    render();
+    render(true);
 }
 
 function pickMaint(id) {
     A.maintPlan = id;
-    render();
+    render(true);
 }
 
 function scrRec(){
   const R=recommend();
-  if(R.nothing) return `<h1>Then you do not need me yet</h1>
-    <div class="sub">You told me nothing is wrong inside or out. I am not going to invent a reason to take your money.</div>
-    <div class="flag"><b>Refresh the page to start over</b> if something actually is bugging you, pick the closest option and I will price it.</div>`;
+  if(R.nothing) return `<h1>Then you don't need me yet</h1>
+    <div class="sub">You told me nothing's wrong inside or out. I'm not going to invent a reason to take your money.</div>
+    <div class="flag"><b>Refresh the page to start over</b> if something actually is bugging you — pick the closest option and I'll price it.</div>`;
   if(R.hand) return `<h1>This one I price by hand</h1><div class="sub">${R.hand}</div>
-    <div class="flag"><b>Why no number</b>Putting a made-up range on this would just waste your time and mine.
-    Give me your details on the next screen and I will get you a real number in writing today.</div>
+    <div class="flag"><b>Why no number</b>Putting a made-up range on this would waste your time and mine. Give me your details on the next screen and I'll get you a real number in writing today.</div>
     <button class="btn-book" onclick="pickPkg('Custom Hand Quote', 'TBD')">Continue to Details</button>`;
     
   let h=`<div class="rec"><div class="top">
     <div class="eyebrow">What I'd put you in</div>
     <div class="name">${R.name.toUpperCase()}</div>
     <div class="price">${span(R.price)}</div>
-    <div class="note">${R.exact?'That is the exact price.'
-      :(R.whyRange||'')+'<br>You get the exact number in writing before anything starts.'}</div>
+    <div class="note">${R.exact?"That's the exact price."
+      :(R.whyRange||'')+"<br>You'll get the exact number in writing before I start."}</div>
    </div><div class="body">`;
    
   R.why.forEach(p=>h+=`<p>${p}</p>`);
   h+=`<ul class="inc">`+R.inc.map(i=>`<li>${i}</li>`).join('')+`</ul>`;
   if(R.surcharge>0) h+=`<p style="margin-top:14px;color:var(--dim);font-size:14px">
-    ${AUTO_PKG[R.key].n} is ${money(R.base)}. The condition work you flagged is the other ${money(R.surcharge)}.</p>`;
+    ${AUTO_PKG[R.key].n} is ${money(R.base)}. The condition work you flagged is the other ${money(R.surcharge)} — priced in.</p>`;
 
   // Boat: receipt-style breakdown when add-ons are stacked on top of the base package
   if(A.type==='boat' && R.items && R.items.length) {
@@ -743,8 +743,7 @@ function scrRec(){
   h+=`</div></div>`;
   
   if(R.correction) h+=`<div class="flag"><b>One thing</b>
-    Scratches and swirls are the only thing I will not price off a form. How much comes out depends on how thick the clear coat is,
-    and I cannot see that from here. I will look at it in person and tell you straight what will and will not come out.</div>`;
+    Scratches and swirls are the one thing I won't price off a form. How much comes out depends on how thick the clear coat is, and I can't see that from here. I'll look at it in person and tell you straight what will and won't come out.</div>`;
     
   // Second card: upgrade path (mid-ladder) OR ceramic upsell (top of ladder). Never both.
   if(R.alt) {
@@ -753,7 +752,7 @@ function scrRec(){
             <div class="alt-name">${R.alt.n}</div>
             <span class="r">${R.alt.p}</span>
             <p style="color:var(--cream);font-size:14px;margin-bottom:12px">
-              Want the full experience? Step up to ${R.alt.n} and get everything above, plus more.
+              Want the whole thing? Step up to ${R.alt.n} — everything above, plus more.
             </p>
             <p style="color:var(--ink);font-weight:600;font-size:14px;margin-top:16px;">Everything in ${R.name}:</p>
             <ul class="inc" style="margin-top:6px; margin-bottom:12px;">`;
@@ -774,8 +773,8 @@ function scrRec(){
         ? ('Starting at '+span([r5(45*R.ft), r5(65*R.ft)]))
         : ('Starting at '+money(CERAMIC_START[A.type]));
       const pitch = A.type==='boat'
-        ? 'You are already putting it in the top package — protect the gelcoat. Ceramic keeps it slick, beading, and easier to wash for seasons, not weeks. Final number depends on the gelcoat, I quote it in person.'
-        : 'You are already putting it in the top package — protect the work. Ceramic keeps the paint slick, beading, and easier to wash for years, not weeks. Final number depends on the paint, I quote it in person.';
+        ? "Already going top tier — might as well protect the gelcoat while I'm on it. Ceramic keeps it slick and beading for seasons, not weeks. Final price depends on the gelcoat, so I'll quote it in person."
+        : "Already going top tier — might as well lock in the paint while I'm on it. Ceramic keeps it slick and beading for years, not weeks. Final price depends on the paint, so I'll quote it in person.";
       h+=`<div class="alt">
             <b>Lock It In</b>
             <div class="alt-name">Ceramic Coating</div>
@@ -784,9 +783,9 @@ function scrRec(){
               ${pitch}
             </p>
             <ul class="extras-list">
-              <li>Long-term paint protection, not a two-week sealant</li>
+              <li>Real protection that lasts years, not weeks like a spray sealant</li>
               <li>Water and dirt slide off — washes take half the time</li>
-              <li>UV and chemical resistance so the color holds</li>
+              <li>Blocks UV and chemicals so the color holds</li>
             </ul>
             <button class="btn-book alt-book" onclick="pickPkg('${R.name} + Ceramic Coating', 'Quoted in person')">Add Ceramic Coating</button>
           </div>`;
@@ -800,7 +799,7 @@ function scrRec(){
         </label>`;
   if(A.maint) {
       h+=`<div class="maint-body">
-            <p>Pick how often. Less often = more built-up dirt on the truck, so the per-visit price steps up.</p>`;
+            <p>Pick how often. Less often = more buildup between visits, so per-visit price steps up.</p>`;
       (MAINT_PLANS_BY_TYPE[A.type]||MAINT_PLANS_BY_TYPE.auto).forEach(p => {
           h+=`<label class="maint-opt ${A.maintPlan===p.id?'sel':''}">
                 <input type="radio" name="maintPlan" value="${p.id}" ${A.maintPlan===p.id?'checked':''} onchange="pickMaint('${p.id}')">
@@ -820,7 +819,7 @@ function scrRec(){
 function scrContact(){
   const o=outcome();
   let h=`<h1>Where and when</h1>
-   <div class="sub">Lock in your day and time, and give us the details on where the vehicle sits.</div>
+   <div class="sub">Lock in your day, time, and where the vehicle sits.</div>
    
    <div class="two">
        <div>
@@ -1048,14 +1047,28 @@ function scrOutcome(){
     return `<div class="out book">
       <h2>THANK YOU FOR CHOOSING BIG DAWGS!</h2>
       </div>
-      <div class="thanks-sub">A member of our team will reach out within 24 hrs to confirm! For questions or same-day bookings call <a href="tel:+15809165189">580-916-5189</a>.</div>`;
+      <div class="thanks-sub">Someone from the team will reach out within 24 hrs to confirm. For questions or same-day bookings call <a href="tel:+15809165189">580-916-5189</a>.</div>`;
   }
+  // Auto: show maintenance discount if enrolled
+  const plan = (A.maint && A.maintPlan) ? (MAINT_PLANS_BY_TYPE[A.type]||MAINT_PLANS_BY_TYPE.auto).find(p=>p.id===A.maintPlan) : null;
+  const priceLine = plan
+    ? `<p style="margin-top:10px;">Package: <b>${A.finalPkgName}</b> <span style="text-decoration:line-through;color:rgba(0,0,0,.5);">${A.finalPrice}</span> <b>${discountedPrice(A.finalPrice)}</b> <span style="font-size:14px;">(10% off with maintenance)</span></p>
+       <p style="margin-top:6px;font-size:15px;">Maintenance plan: <b>${plan.label}</b> at ${money(plan.price)}/visit — kicks in after your first detail.</p>`
+    : `<p>We have received your request for the <b>${A.finalPkgName}</b> package.</p>`;
   return `<div class="out book">
     <h2>YOU'RE ON THE BOOK</h2>
-    <p>We have received your request for the <b>${A.finalPkgName}</b> package.</p>
-    <p style="margin-top: 10px;">We'll see you on <b>${formatDate(A.date)}</b> at <b>${formatTime(A.time)}</b>.</p>
+    ${priceLine}
+    <p style="margin-top: 10px;">See you on <b>${formatDate(A.date)}</b> at <b>${formatTime(A.time)}</b>.</p>
     </div>
-    <div class="sub">If you have any immediate questions, or need to send photos of your vehicle, text us at (580) 916-5189.</div>`;
+    <div class="sub">Any questions or need to send photos, text or call <a href="tel:+15809165189">580-916-5189</a>.</div>`;
+}
+
+function discountedPrice(priceStr){
+  // priceStr may be "$249", "$249 – $339", or "Quoted in person". Only discount pure single-price strings.
+  const m = String(priceStr||'').match(/^\$([0-9,]+)$/);
+  if(!m) return priceStr;
+  const n = parseInt(m[1].replace(/,/g,''),10);
+  return '$'+Math.round(n*0.9).toLocaleString();
 }
 
 // Utility to make date look nice (e.g. 2024-10-15 -> Oct 15, 2024)
